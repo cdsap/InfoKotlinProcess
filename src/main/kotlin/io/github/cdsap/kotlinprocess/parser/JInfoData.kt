@@ -1,19 +1,29 @@
-package io.github.cdsap.kotlinprocess.model
+package io.github.cdsap.kotlinprocess.parser
+
+import io.github.cdsap.kotlinprocess.model.ProcessJInfo
 
 
 class JInfoData {
 
     fun process(result: String): Map<String, ProcessJInfo> {
         val processP = mutableMapOf<String, ProcessJInfo>()
-        val linesJinfo = result.split("\n").dropLast(1)
-        val xNumberOfProcess = linesJinfo.size / 2
+        val lines = result.split("\n")
+        if (lines.last().trim() == "") {
+            lines.dropLast(1)
+        }
+        val xNumberOfProcess = lines.size / 2
         var auxIndex = 0
         for (i in 0 until xNumberOfProcess) {
-            val vmFlags = linesJinfo[auxIndex].split("\\s+".toRegex()).dropLast(1)
-                .first { it.contains("-XX:MaxHeapSize=") }.replace("-XX:MaxHeapSize=", "")
-            val process = linesJinfo[++auxIndex].split("\\s+".toRegex())
-            auxIndex++
-            processP[process.first()] = ProcessJInfo(vmFlags.toDouble())
+            val flags = lines[auxIndex].split("\\s+".toRegex())
+            if (!flags.last().contains("-XX:MaxHeapSize=")) {
+                flags.dropLast(1)
+            }
+            val heapSizeFlag = flags.firstOrNull { it.contains("-XX:MaxHeapSize=") }?.replace("-XX:MaxHeapSize=", "")
+            val process = lines[++auxIndex].split("\\s+".toRegex())
+            if (heapSizeFlag != null) {
+                auxIndex++
+                processP[process.first()] = ProcessJInfo(heapSizeFlag.toDouble())
+            }
         }
         return processP
     }

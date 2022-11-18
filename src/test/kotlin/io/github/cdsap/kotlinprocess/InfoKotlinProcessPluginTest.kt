@@ -28,17 +28,9 @@ class InfoKotlinProcessPluginTest {
             .withPluginClasspath()
             .withGradleVersion("7.5.1")
             .build()
-
-        assertTrue(
-            build.output.contains(
-                """
-            ┌──────────────────────────────────────────────────────────────────────────────┐
-            │  Kotlin processes                                                            │
-            ├─────────┬──────────┬───────────┬────────────┬───────────────┬────────────────┤
-            │  PID    │  Max     │  Usage    │  Capacity  │  GC Time      │  Uptime        │
-            ├─────────┼──────────┼───────────┼────────────┼───────────────┼────────────────┤
-        """.trimIndent()
-            )
-        )
+        assertTrue(build.output.contains("Kotlin processes"))
+        assertTrue(build.output.contains("PID"))
+        assertTrue(build.output.contains("Capacity"))
+        assertTrue(build.output.contains("Uptime"))
     }
 }

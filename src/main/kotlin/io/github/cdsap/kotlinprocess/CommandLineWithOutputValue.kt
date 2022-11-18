@@ -1,4 +1,4 @@
-package io.github.cdsap.valuesource.commandline
+package io.github.cdsap.kotlinprocess
 
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ValueSource
@@ -34,5 +34,4 @@ abstract class CommandLineWithOutputValue : ValueSource<String, CommandLineWithO
             ""
         }
     }
-
 }

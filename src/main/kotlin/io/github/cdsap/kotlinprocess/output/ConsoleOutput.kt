@@ -1,8 +1,9 @@
-package io.github.cdsap.kotlinprocess.output.console
+package io.github.cdsap.kotlinprocess.output
 
 import com.jakewharton.picnic.TextAlignment
 import com.jakewharton.picnic.table
 import io.github.cdsap.kotlinprocess.model.Process
+import io.github.cdsap.kotlinprocess.toMinutes
 
 class ConsoleOutput(private val processes: List<Process>) {
     fun print() {
@@ -17,7 +18,7 @@ class ConsoleOutput(private val processes: List<Process>) {
                 body {
                     row {
                         cell("Kotlin processes") {
-                            columnSpan = 5
+                            columnSpan = 6
                         }
                     }
                     row {
@@ -32,15 +33,14 @@ class ConsoleOutput(private val processes: List<Process>) {
                     processes.forEach {
                         row {
                             cell(it.pid)
-                            cell("${it.jInfo.max} Gb")
-                            cell("${it.jstatData.usage} Gb")
-                            cell("${it.jstatData.capacity} Gb")
-                            cell("${it.jstatData.gcTime} minutes")
-                            cell("${it.jstatData.uptime} minutes")
+                            cell("${it.max} Gb")
+                            cell("${it.usage} Gb")
+                            cell("${it.capacity} Gb")
+                            cell("${it.gcTime} minutes")
+                            cell("${it.uptime} minutes")
                         }
                     }
                 }
-
             })
     }
 }

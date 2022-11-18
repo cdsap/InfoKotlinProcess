@@ -5,8 +5,9 @@ pluginManagement {
         mavenCentral()
     }
 }
+
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         gradlePluginPortal()
         google()
@@ -14,4 +15,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CommandLineValueSource"
+rootProject.name = "infokotlinprocess"
+

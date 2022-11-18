@@ -1,4 +1,4 @@
-package io.github.cdsap.valuesource.commandline.model
+package io.github.cdsap.kotlinprocess.model
 
 data class ProcessJstat(
     val usage: Double,
@@ -6,4 +6,3 @@ data class ProcessJstat(
     val gcTime: Double,
     val uptime: Double
 )
-

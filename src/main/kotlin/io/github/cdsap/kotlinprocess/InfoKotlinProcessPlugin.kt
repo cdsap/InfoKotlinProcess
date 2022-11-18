@@ -1,68 +1,54 @@
-package io.github.cdsap.valuesource.commandline
+package io.github.cdsap.kotlinprocess
 
+import com.gradle.scan.plugin.BuildScanExtension
+import io.github.cdsap.kotlinprocess.output.BuildScanOutput
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
 class InfoKotlinProcessPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        val jstat =
-            target.execute("jps | grep KotlinCompileDaemon | sed 's/KotlinCompileDaemon//' | while read ln; do  jstat -gc -t \$ln; echo \"\$ln\"; done")
-        val jinfo =
-            target.execute("jps | grep KotlinCompileDaemon | sed 's/KotlinCompileDaemon//' | while read ln; do  jinfo \$ln  | grep \"XX:MaxHeapSize\"; echo \"\$ln\";  done")
         target.gradle.rootProject {
-
-            val extension = extensions.findByType(com.gradle.scan.plugin.BuildScanExtension::class.java)
-            if (extension != null) {
-                val buildScanExtension = extensions.getByType(com.gradle.scan.plugin.BuildScanExtension::class.java)
-                buildScanExtension.buildFinished {
-                    val k = ConsolidateProcesses().consolidate(jstat.get(), jinfo.get())
-                    k.map {
-                        buildScanExtension.value(
-                            "Kotlin-Process-${it.pid}-max",
-                            "${it.jInfo.max.toGigs()} GB"
-                        )
-                        buildScanExtension.value(
-                            "Kotlin-Process-${it.pid}-usage",
-                            "${it.jstatData.usage.toGigs()} GB"
-                        )
-                        buildScanExtension.value(
-                            "Kotlin-Process-${it.pid}-capacity",
-                            "${it.jstatData.capacity.toGigs()} GB"
-                        )
-                        buildScanExtension.value(
-                            "Kotlin-Process-${it.pid}-uptime",
-                            "${it.jstatData.uptime.toMinutes()} minutes"
-                        )
-                        buildScanExtension.value(
-                            "Kotlin-Process-${it.pid}-gcTime",
-                            "${it.jstatData.gcTime.toMinutes()} minutes"
-                        )
-
-                    }
-                }
+            val buildScanExtension = extensions.findByType(com.gradle.scan.plugin.BuildScanExtension::class.java)
+            if (buildScanExtension != null) {
+                buildScanReporting(project, buildScanExtension)
+            } else {
+                consoleReporting(target)
             }
         }
     }
+
+    private fun consoleReporting(project: Project) {
+        project.gradle.sharedServices.registerIfAbsent(
+            "kotlinProcessService", InfoKotlinProcessBuildService::class.java
+        ) {
+            parameters.jInfoProvider = project.jInfo()
+            parameters.jStatProvider = project.jStat()
+        }.get()
+    }
+
+    private fun buildScanReporting(
+        project: Project,
+        buildScanExtension: BuildScanExtension
+    ) {
+        val processes = ConsolidateProcesses().consolidate(project.jStat().get(), project.jInfo().get())
+
+        buildScanExtension.buildFinished {
+            BuildScanOutput(buildScanExtension, processes).addProcessesInfoToBuildScan()
+        }
+    }
+}
+
+fun Project.jStat(): Provider<String> {
+    return execute("jps | grep KotlinCompileDaemon | sed 's/KotlinCompileDaemon//' | while read ln; do  jstat -gc -t \$ln; echo \"\$ln\"; done")
+}
+
+fun Project.jInfo(): Provider<String> {
+    return execute("jps | grep KotlinCompileDaemon | sed 's/KotlinCompileDaemon//' | while read ln; do  jinfo \$ln  | grep \"XX:MaxHeapSize\"; echo \"\$ln\";  done")
 }
 
 fun Project.execute(command: String): Provider<String> {
     return providers.of(CommandLineWithOutputValue::class.java) {
         parameters.commands.set(command)
     }
-}
-
-fun Double.roundTo(numFractionDigits: Int): Double {
-    val factor = 10.0.pow(numFractionDigits.toDouble())
-    return (this * factor).roundToInt() / factor
-}
-
-fun Double.toGigs(): Double {
-    return (this / 1048576).roundTo(2)
-}
-
-fun Double.toMinutes(): Double {
-    return (this / 60).roundTo(2)
 }
