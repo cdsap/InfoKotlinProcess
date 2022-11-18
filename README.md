@@ -1,6 +1,6 @@
 # Info Kotlin Process Plugin
 Includes information about Kotlin processes in the Build Scans or in the build output.
-The plugin is compatible with configuration cache
+The plugin is compatible with configuration cache.
 
 ## Usage
 #### Kotlin
