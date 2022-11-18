@@ -14,6 +14,7 @@ class ConsolidateProcesses {
         val jStatData = JStatData().process(jStatResult)
         if (jInfoData.size != jStatData.size) {
             // different number of processes
+            // ignore consolidation
         } else {
             jInfoData.forEach {
                 if (jStatData.contains(it.key)) {
