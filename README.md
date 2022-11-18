@@ -55,7 +55,9 @@ apply plugin: "io.github.cdsap.kotlinprocess"
 ### Build Scans
 If you are using Gradle Enterprise, the information about the Kotlin processes will be included as custom value in the
 Build Scan:
+
 ![](images/buildscan.png)
+
 ### Build Output
 If you are not using Gradle Enterprise, the information about the Kotlin processes will be included at the end of the build:
 ```
