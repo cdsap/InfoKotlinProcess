@@ -3,6 +3,8 @@ Includes information about Kotlin processes in the Build Scans or in the build o
 The plugin is compatible with configuration cache.
 
 ## Usage
+Apply the plugin in the main build.gradle(.kts) configuration file:
+
 #### Kotlin
 Using the plugins DSL:
 ```
