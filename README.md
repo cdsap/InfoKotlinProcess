@@ -3,6 +3,8 @@ Includes information about Kotlin processes in the Build Scans or in the build o
 The plugin is compatible with configuration cache.
 
 ## Usage
+Apply the plugin in the main build.gradle(.kts) configuration file:
+
 #### Kotlin
 Using the plugins DSL:
 ```
@@ -31,7 +33,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 Using the plugins DSL:
 ```
 plugins {
-  id "io.github.cdsap.talaiot" version "0.1"
+  id "io.github.cdsap.kotlinprocess" version "0.1"
 }
 
 ```
