@@ -31,7 +31,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 Using the plugins DSL:
 ```
 plugins {
-  id "io.github.cdsap.talaiot" version "0.1"
+  id "io.github.cdsap.kotlinprocess" version "0.1"
 }
 
 ```
