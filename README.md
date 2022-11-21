@@ -3,23 +3,21 @@ Includes information about Kotlin processes in the Build Scans or in the build o
 The plugin is compatible with configuration cache.
 
 ## Usage
-Apply the plugin in the main build.gradle(.kts) configuration file:
+Apply the plugin in the main `build.gradle(.kts)` configuration file:
 
 #### Kotlin
 Using the plugins DSL:
-```
+``` groovy
 plugins {
   id("io.github.cdsap.kotlinprocess") version "0.1"
 }
 ```
 
 Using legacy plugin application:
-```
+``` groovy
 buildscript {
   repositories {
-    maven {
-      url = uri("https://plugins.gradle.org/m2/")
-    }
+    gradlePluginPortal()
   }
   dependencies {
     classpath("io.github.cdsap:infokotlinprocess:0.1")
@@ -31,7 +29,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 
 #### Groovy
 Using the plugins DSL:
-```
+``` groovy
 plugins {
   id "io.github.cdsap.kotlinprocess" version "0.1"
 }
@@ -39,12 +37,10 @@ plugins {
 ```
 
 Using legacy plugin application:
-```
+``` groovy
 buildscript {
   repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
+    gradlePluginPortal()
   }
   dependencies {
     classpath "io.github.cdsap:infokotlinprocess:0.1"
