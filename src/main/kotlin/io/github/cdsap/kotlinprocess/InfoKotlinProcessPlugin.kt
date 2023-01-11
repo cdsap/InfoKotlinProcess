@@ -31,9 +31,11 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
         project: Project,
         buildScanExtension: BuildScanExtension
     ) {
-        val processes = ConsolidateProcesses().consolidate(project.jStat().get(), project.jInfo().get())
+        val jStat = project.jStat()
+        val jInfo = project.jInfo()
 
         buildScanExtension.buildFinished {
+            val processes = ConsolidateProcesses().consolidate(jStat.get(), jInfo.get())
             BuildScanOutput(buildScanExtension, processes).addProcessesInfoToBuildScan()
         }
     }

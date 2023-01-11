@@ -21,3 +21,6 @@ jobs:
               uses: gradle/gradle-build-action@v2
             - name: Execute Gradle build
               run:  ./gradlew test
+              env:
+                GE_URL: ${{ secrets.GE_URL }}
+                GE_API_KEY: ${{ secrets.GE_API_KEY }}
