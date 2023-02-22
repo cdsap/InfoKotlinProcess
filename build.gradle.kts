@@ -16,7 +16,7 @@ java {
 
 dependencies {
     implementation("com.jakewharton.picnic:picnic:0.6.0")
-    implementation("com.gradle.enterprise:com.gradle.enterprise.gradle.plugin:3.11.1")
+    implementation("com.gradle.enterprise:com.gradle.enterprise.gradle.plugin:3.12.3")
     testImplementation("junit:junit:4.13.2")
 }
 

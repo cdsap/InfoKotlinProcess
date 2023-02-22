@@ -26,7 +26,7 @@ class InfoKotlinProcessPluginTest {
                 }
             """.trimIndent()
         )
-        listOf("7.5.1", "7.6").forEach {
+        listOf("7.5.1", "7.6", "8.0.1").forEach {
             val build = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withArguments("compileKotlin", "--info")
@@ -55,7 +55,7 @@ class InfoKotlinProcessPluginTest {
 
             """.trimIndent()
         )
-        listOf("7.5.1", "7.6").forEach {
+        listOf("7.5.1", "7.6", "8.0.1").forEach {
             val firstBuild = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withArguments("compileKotlin", "--configuration-cache")
@@ -110,7 +110,7 @@ class InfoKotlinProcessPluginTest {
 
             """.trimIndent()
         )
-        listOf("7.5.1", "7.6").forEach {
+        listOf("7.5.1", "7.6", "8.0.1").forEach {
             val firstBuild = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withArguments("compileKotlin", "--configuration-cache")
