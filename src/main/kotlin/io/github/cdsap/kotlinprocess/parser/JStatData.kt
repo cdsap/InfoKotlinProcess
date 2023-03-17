@@ -46,6 +46,10 @@ class JStatData {
         return processes
     }
 
+    // When using ParallelGC argument concurrent gc times are not informed, generating an output like
+    //Timestamp    S0C    S1C    S0U   S1U   EC   EU    OC   OU   MC   MU   CCSC   CCSU   YGC   YGCT FGC FGCT  CGC  CGCT GCT
+    //   298.0     22.0   20.0  0.0    0.0   1.0  1.8   1.0  0.9  4.0  8.3   6.0    5.0    4    0.3   4   0.7   -    -    1
+    // We need to remove the entries CGC and CGCT from the headers and values
     private fun removeConcurrentGCTimes(
         rawHeaders: List<String>,
         rawValues: List<String>
