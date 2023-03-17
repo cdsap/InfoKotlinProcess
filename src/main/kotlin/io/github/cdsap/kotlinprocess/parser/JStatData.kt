@@ -19,8 +19,11 @@ class JStatData {
         var currentIndex = 0
 
         for (i in 0 until numberOfProcessesDetected) {
-            val headers = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
-            val value = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
+            val rawHeaders = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
+            val rawValues = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
+
+            val (headers, value) = removeConcurrentGCTimes(rawHeaders, rawValues)
+
             if (headers.size == value.size && checkValuesAraValid(value)) {
                 val process = lines[++currentIndex].split("\\s+".toRegex())
                 val jspMapValues = mutableMapOf<String, Double>()
@@ -40,8 +43,32 @@ class JStatData {
 
             }
         }
-
         return processes
+    }
+
+    // When using ParallelGC argument concurrent gc times are not informed, generating an output like
+    //Timestamp    S0C    S1C    S0U   S1U   EC   EU    OC   OU   MC   MU   CCSC   CCSU   YGC   YGCT FGC FGCT  CGC  CGCT GCT
+    //   298.0     22.0   20.0  0.0    0.0   1.0  1.8   1.0  0.9  4.0  8.3   6.0    5.0    4    0.3   4   0.7   -    -    1
+    // We need to remove the entries CGC and CGCT from the headers and values
+    private fun removeConcurrentGCTimes(
+        rawHeaders: List<String>,
+        rawValues: List<String>
+    ): Pair<List<String>, List<String>> {
+        return if (rawHeaders.contains("CGC") && rawHeaders.contains("CGCT")
+            && rawHeaders.size == rawValues.size ) {
+            val concurrentGCTime = rawHeaders.indexOf("CGC")
+            val concurrentGCTimeTotal = rawHeaders.indexOf("CGCT")
+
+            val headers = rawHeaders.toMutableList()
+            headers.removeAt(concurrentGCTime)
+            headers.removeAt(concurrentGCTimeTotal - 1)
+            val value = rawValues.toMutableList()
+            value.removeAt(concurrentGCTime)
+            value.removeAt(concurrentGCTimeTotal - 1)
+            Pair(headers.toList(), value.toList())
+        } else {
+            Pair(rawHeaders, rawValues)
+        }
     }
 
     private fun checkValuesAraValid(jspMapValues: List<String>): Boolean {
