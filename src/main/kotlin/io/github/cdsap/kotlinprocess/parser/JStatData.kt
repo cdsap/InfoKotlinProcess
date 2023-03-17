@@ -19,8 +19,11 @@ class JStatData {
         var currentIndex = 0
 
         for (i in 0 until numberOfProcessesDetected) {
-            val headers = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
-            val value = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
+            val rawHeaders = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
+            val rawValues = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
+
+            val (headers, value) = removeConcurrentGCTimes(rawHeaders, rawValues)
+
             if (headers.size == value.size && checkValuesAraValid(value)) {
                 val process = lines[++currentIndex].split("\\s+".toRegex())
                 val jspMapValues = mutableMapOf<String, Double>()
@@ -40,8 +43,27 @@ class JStatData {
 
             }
         }
-
         return processes
+    }
+
+    private fun removeConcurrentGCTimes(
+        rawHeaders: List<String>,
+        rawValues: List<String>
+    ): Pair<List<String>, List<String>> {
+        return if (rawHeaders.contains("CGC") && rawHeaders.contains("CGCT")) {
+            val concurrentGCTime = rawHeaders.indexOf("CGC")
+            val concurrentGCTimeTotal = rawHeaders.indexOf("CGCT")
+
+            val headers = rawHeaders.toMutableList()
+            headers.removeAt(concurrentGCTime)
+            headers.removeAt(concurrentGCTimeTotal - 1)
+            val value = rawValues.toMutableList()
+            value.removeAt(concurrentGCTime)
+            value.removeAt(concurrentGCTimeTotal - 1)
+            Pair(headers.toList(), value.toList())
+        } else {
+            Pair(rawHeaders, rawValues)
+        }
     }
 
     private fun checkValuesAraValid(jspMapValues: List<String>): Boolean {
