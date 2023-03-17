@@ -19,7 +19,14 @@ dependencies {
     implementation("com.gradle.enterprise:com.gradle.enterprise.gradle.plugin:3.12.3")
     testImplementation("junit:junit:4.13.2")
 }
+tasks.withType<Test>().configureEach {
+    filter {
 
+        if (project.hasProperty("excludeTests")) {
+            excludeTest(project.property("excludeTests").toString(),"")
+        }
+    }
+}
 gradlePlugin {
     plugins {
         create("InfoKotlinProcessPlugin") {

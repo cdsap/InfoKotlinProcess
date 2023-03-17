@@ -50,7 +50,8 @@ class JStatData {
         rawHeaders: List<String>,
         rawValues: List<String>
     ): Pair<List<String>, List<String>> {
-        return if (rawHeaders.contains("CGC") && rawHeaders.contains("CGCT")) {
+        return if (rawHeaders.contains("CGC") && rawHeaders.contains("CGCT")
+            && rawHeaders.size == rawValues.size ) {
             val concurrentGCTime = rawHeaders.indexOf("CGC")
             val concurrentGCTimeTotal = rawHeaders.indexOf("CGCT")
 
