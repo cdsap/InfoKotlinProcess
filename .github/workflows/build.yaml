@@ -45,9 +45,6 @@ jobs:
             - name: Execute Gradle build
               run:  ./gradlew test --tests io.github.cdsap.kotlinprocess.InfoKotlinProcessPluginTest
               env:
-                GRADLE_OPTS: |
-                  -Dorg.gradle.jvmargs="-Xmx1G"
-                  -Dkotlin.daemon.jvm.options="-Xmx1G"
             - uses: actions/upload-artifact@v3
               with:
                 name: ${{ matrix.os }}-${{ matrix.vendor }}-${{ matrix.version }}
