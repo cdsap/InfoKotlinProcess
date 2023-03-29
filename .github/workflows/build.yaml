@@ -44,7 +44,6 @@ jobs:
               uses: gradle/gradle-build-action@v2
             - name: Execute Gradle build
               run:  ./gradlew test --tests io.github.cdsap.kotlinprocess.InfoKotlinProcessPluginTest
-              env:
             - uses: actions/upload-artifact@v3
               with:
                 name: ${{ matrix.os }}-${{ matrix.vendor }}-${{ matrix.version }}
