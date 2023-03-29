@@ -50,5 +50,5 @@ jobs:
                   -Dkotlin.daemon.jvm.options="-Xmx1G"
             - uses: actions/upload-artifact@v3
               with:
-              name: ${{ matrix.os }}-${{ matrix.vendor }}-${{ matrix.version }}
-              path: build/reports/*
+                name: ${{ matrix.os }}-${{ matrix.vendor }}-${{ matrix.version }}
+                path: build/reports/*
