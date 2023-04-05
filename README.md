@@ -77,5 +77,5 @@ BUILD SUCCESSFUL in 35s
 * Gradle 7.5
 
 ## Libraries
-* com.gradle.enterprise:com.gradle.enterprise.gradle.plugin
-* com.jakewharton.picnic:picnic
+* `com.gradle.enterprise:com.gradle.enterprise.gradle.plugin`
+* `com.jakewharton.picnic:picnic`
