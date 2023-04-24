@@ -48,7 +48,7 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
 
             """.trimIndent()
         )
-        listOf("8.0.1").forEach {
+        listOf("8.1.1").forEach {
             val firstBuild = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withArguments("compileKotlin", "--configuration-cache")
