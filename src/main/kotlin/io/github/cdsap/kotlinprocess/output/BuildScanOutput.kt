@@ -30,6 +30,10 @@ class BuildScanOutput(
                 "Kotlin-Process-${it.pid}-gcTime",
                 "${it.gcTime} minutes"
             )
+            buildScanExtension.value(
+                "Kotlin-Process-${it.pid}-gcType",
+                it.type
+            )
         }
     }
 }

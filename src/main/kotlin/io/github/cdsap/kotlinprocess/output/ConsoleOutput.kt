@@ -18,7 +18,7 @@ class ConsoleOutput(private val processes: List<Process>) {
                 body {
                     row {
                         cell("Kotlin processes") {
-                            columnSpan = 6
+                            columnSpan = 7
                         }
                     }
                     row {
@@ -27,6 +27,7 @@ class ConsoleOutput(private val processes: List<Process>) {
                         cell("Usage")
                         cell("Capacity")
                         cell("GC Time")
+                        cell("GC Type")
                         cell("Uptime")
                     }
 
@@ -37,6 +38,7 @@ class ConsoleOutput(private val processes: List<Process>) {
                             cell("${it.usage} Gb")
                             cell("${it.capacity} Gb")
                             cell("${it.gcTime} minutes")
+                            cell(it.type)
                             cell("${it.uptime} minutes")
                         }
                     }

@@ -22,7 +22,9 @@ class JStatData {
             val rawHeaders = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
             val rawValues = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
 
-            val (headers, value) = removeConcurrentGCTimes(rawHeaders, rawValues)
+            val typeOfCollector = getCollector(rawHeaders, rawValues)
+
+            val (headers, value) = preparePairsByCollector(typeOfCollector, rawHeaders, rawValues)
 
             if (headers.size == value.size && checkValuesAraValid(value)) {
                 val process = lines[++currentIndex].split("\\s+".toRegex())
@@ -35,10 +37,11 @@ class JStatData {
                     aux++
                 }
                 processes[process.first()] = ProcessJstat(
-                    capacity = totalCapacity(jspMapValues),
-                    usage = usage(jspMapValues),
+                    capacity = totalCapacity(typeOfCollector, jspMapValues),
+                    usage = usage(typeOfCollector, jspMapValues),
                     gcTime = gcTime(jspMapValues),
-                    uptime = uptime(jspMapValues)
+                    uptime = uptime(jspMapValues),
+                    typeGC = typeOfCollector.name
                 )
 
             }
@@ -46,28 +49,82 @@ class JStatData {
         return processes
     }
 
-    // When using ParallelGC argument concurrent gc times are not informed, generating an output like
-    //Timestamp    S0C    S1C    S0U   S1U   EC   EU    OC   OU   MC   MU   CCSC   CCSU   YGC   YGCT FGC FGCT  CGC  CGCT GCT
-    //   298.0     22.0   20.0  0.0    0.0   1.0  1.8   1.0  0.9  4.0  8.3   6.0    5.0    4    0.3   4   0.7   -    -    1
-    // We need to remove the entries CGC and CGCT from the headers and values
-    private fun removeConcurrentGCTimes(
+    private fun getCollector(rawHeaders: List<String>, rawValues: List<String>): TypeCollector {
+        val socHeaderPosition = rawHeaders.indexOf("S0C")
+        val soc = rawValues[socHeaderPosition]
+        if (soc == "-") {
+            return TypeCollector.Z
+        } else {
+            val socCGC = rawHeaders.indexOf("CGC")
+            val cgc = rawValues[socCGC]
+            if (cgc == "-") {
+                return TypeCollector.PARALLEL
+            } else {
+                return TypeCollector.G1
+            }
+        }
+    }
+
+    private fun preparePairsByCollector(
+        typeOfCollector: TypeCollector,
         rawHeaders: List<String>,
         rawValues: List<String>
     ): Pair<List<String>, List<String>> {
-        return if (rawHeaders.contains("CGC") && rawHeaders.contains("CGCT")
-            && rawHeaders.size == rawValues.size ) {
-            val concurrentGCTime = rawHeaders.indexOf("CGC")
-            val concurrentGCTimeTotal = rawHeaders.indexOf("CGCT")
+        when (typeOfCollector) {
+            TypeCollector.G1 -> {
+                return Pair(rawHeaders, rawValues)
+            }
 
-            val headers = rawHeaders.toMutableList()
-            headers.removeAt(concurrentGCTime)
-            headers.removeAt(concurrentGCTimeTotal - 1)
-            val value = rawValues.toMutableList()
-            value.removeAt(concurrentGCTime)
-            value.removeAt(concurrentGCTimeTotal - 1)
-            Pair(headers.toList(), value.toList())
-        } else {
-            Pair(rawHeaders, rawValues)
+            TypeCollector.PARALLEL -> {
+                val concurrentGCTime = rawHeaders.indexOf("CGC")
+                val concurrentGCTimeTotal = rawHeaders.indexOf("CGCT")
+
+                val headers = rawHeaders.toMutableList()
+                headers.removeAt(concurrentGCTime)
+                headers.removeAt(concurrentGCTimeTotal - 1)
+                val value = rawValues.toMutableList()
+                value.removeAt(concurrentGCTime)
+                value.removeAt(concurrentGCTimeTotal - 1)
+                return Pair(headers.toList(), value.toList())
+            }
+
+            TypeCollector.Z -> {
+                val soc = rawHeaders.indexOf("S0C")
+                val s1c = rawHeaders.indexOf("S1C")
+                val sou = rawHeaders.indexOf("S0U")
+                val s1u = rawHeaders.indexOf("S1U")
+                val ec = rawHeaders.indexOf("EC")
+                val eu = rawHeaders.indexOf("EU")
+                val ygc = rawHeaders.indexOf("YGC")
+                val ygct = rawHeaders.indexOf("YGCT")
+                val fgc = rawHeaders.indexOf("FGC")
+                val fgct = rawHeaders.indexOf("FGCT")
+
+                val headers = rawHeaders.toMutableList()
+                headers.removeAt(soc)
+                headers.removeAt(s1c - 1)
+                headers.removeAt(sou - 2)
+                headers.removeAt(s1u - 3)
+                headers.removeAt(ec - 4)
+                headers.removeAt(eu - 5)
+                headers.removeAt(ygc - 6)
+                headers.removeAt(ygct - 7)
+                headers.removeAt(fgc - 8)
+                headers.removeAt(fgct - 9)
+
+                val value = rawValues.toMutableList()
+                value.removeAt(soc)
+                value.removeAt(s1c - 1)
+                value.removeAt(sou - 2)
+                value.removeAt(s1u - 3)
+                value.removeAt(ec - 4)
+                value.removeAt(eu - 5)
+                value.removeAt(ygc - 6)
+                value.removeAt(ygct - 7)
+                value.removeAt(fgc - 8)
+                value.removeAt(fgct - 9)
+                return Pair(headers.toList(), value.toList())
+            }
         }
     }
 
@@ -82,12 +139,20 @@ class JStatData {
         return true
     }
 
-    private fun totalCapacity(jspMapValues: Map<String, Double>): Double {
-        return jspMapValues["EC"]!! + jspMapValues["OC"]!! + jspMapValues["S0C"]!! + jspMapValues["S1C"]!!
+    private fun totalCapacity(typeOfCollector: TypeCollector, jspMapValues: Map<String, Double>): Double {
+        if(typeOfCollector == TypeCollector.Z) {
+            return jspMapValues["OC"]!! + jspMapValues["MC"]!!
+        } else {
+            return jspMapValues["EC"]!! + jspMapValues["OC"]!! + jspMapValues["S0C"]!! + jspMapValues["S1C"]!!
+        }
     }
 
-    private fun usage(jspMapValues: Map<String, Double>): Double {
-        return jspMapValues["S0U"]!! + jspMapValues["S1U"]!! + jspMapValues["EU"]!! + jspMapValues["OU"]!!
+    private fun usage(typeOfCollector: TypeCollector, jspMapValues: Map<String, Double>): Double {
+        if(typeOfCollector == TypeCollector.Z) {
+            return jspMapValues["OU"]!! + jspMapValues["MU"]!!
+        } else {
+            return jspMapValues["S0U"]!! + jspMapValues["S1U"]!! + jspMapValues["EU"]!! + jspMapValues["OU"]!!
+        }
     }
 
     private fun gcTime(jspMapValues: Map<String, Double>): Double {
@@ -97,4 +162,10 @@ class JStatData {
     private fun uptime(jspMapValues: Map<String, Double>): Double {
         return jspMapValues["Timestamp"]!!
     }
+}
+
+enum class TypeCollector {
+    G1,
+    PARALLEL,
+    Z
 }

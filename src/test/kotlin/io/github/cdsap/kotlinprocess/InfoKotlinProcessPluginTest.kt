@@ -3,6 +3,7 @@ package io.github.cdsap.kotlinprocess
 import junit.framework.TestCase.assertTrue
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -31,7 +32,7 @@ class InfoKotlinProcessPluginTest {
     fun testPluginIsCompatibleWithConfigurationCacheWithoutGradleEnterprise() {
         createBuildGradle()
 
-       gradleVersions.forEach {
+        gradleVersions.forEach {
             val firstBuild = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
                 .withArguments("compileKotlin", "--configuration-cache")
@@ -52,9 +53,12 @@ class InfoKotlinProcessPluginTest {
 
     @Test
     fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmArgs() {
-        testProjectDir.newFile("gradle.properties").appendText("""
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
             org.gradle.jvmargs=-Xmx256m -Dfile.encoding=UTF-8
-        """.trimIndent())
+        """.trimIndent()
+        )
+
         createBuildGradle()
         createKotlinClass()
 
@@ -66,10 +70,12 @@ class InfoKotlinProcessPluginTest {
 
     @Test
     fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmArgsAndKotlinJvm() {
-        testProjectDir.newFile("gradle.properties").appendText("""
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
             org.gradle.jvmargs=-Xmx256m -Dfile.encoding=UTF-8
             kotlin.daemon.jvmargs=-Xmx128m
-        """.trimIndent())
+        """.trimIndent()
+        )
         createBuildGradle()
         createKotlinClass()
 
@@ -81,10 +87,12 @@ class InfoKotlinProcessPluginTest {
 
     @Test
     fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmArgsAndKotlinGCJvm() {
-        testProjectDir.newFile("gradle.properties").appendText("""
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
             org.gradle.jvmargs=-Xmx256m -Dfile.encoding=UTF-8
             kotlin.daemon.jvmargs=-Xmx128m -XX:+UseParallelGC
-        """.trimIndent())
+        """.trimIndent()
+        )
         createBuildGradle()
         createKotlinClass()
 
@@ -96,30 +104,58 @@ class InfoKotlinProcessPluginTest {
 
     @Test
     fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinJvm() {
-        testProjectDir.newFile("gradle.properties").appendText("""
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
             org.gradle.jvmargs=-Xmx256m -XX:+UseParallelGC -Dfile.encoding=UTF-8
-        """.trimIndent())
+        """.trimIndent()
+        )
         createBuildGradle()
         createKotlinClass()
 
         gradleVersions.forEach {
             val build = simpleKotlinCompileBuild(it)
             assertTerminalOutput(build)
+            assertTrue(build.output.contains("G1"))
         }
     }
 
     @Test
     fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinGCJvm() {
-        testProjectDir.newFile("gradle.properties").appendText("""
-            org.gradle.jvmargs=-Xmx256m -XX:+UseParallelGC -Dfile.encoding=UTF-8
-            kotlin.daemon.jvmargs=-Xmx128m -XX:+UseParallelGC
-        """.trimIndent())
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
+            org.gradle.jvmargs=-Xmx258m -XX:+UseParallelGC -Dfile.encoding=UTF-8
+            kotlin.daemon.jvmargs=-Xmx600m -XX:+UseParallelGC
+        """.trimIndent()
+        )
         createBuildGradle()
         createKotlinClass()
 
         gradleVersions.forEach {
             val build = simpleKotlinCompileBuild(it)
             assertTerminalOutput(build)
+            assertTrue(build.output.contains("PARALLEL"))
+        }
+    }
+
+    @Test
+    fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinZ1Jvm() {
+        Assume.assumeTrue(Runtime.version().feature() >= 15)
+
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
+            org.gradle.jvmargs=-Xmx256m -XX:+UseParallelGC -Dfile.encoding=UTF-8
+            kotlin.daemon.jvmargs=-Xmx750m  -XX:+UnlockExperimentalVMOptions -XX:+UseZGC
+        """.trimIndent()
+        )
+
+        createBuildGradle17()
+        createKotlinClass()
+
+        gradleVersions.forEach {
+            val build = simpleKotlinCompileBuild(it)
+            assertTerminalOutput(build)
+            assertTrue(build.output.contains("Z"))
+
         }
     }
 
@@ -151,6 +187,27 @@ class InfoKotlinProcessPluginTest {
                     }
                     repositories {
                         mavenCentral()
+                    }
+
+                """.trimIndent()
+        )
+    }
+
+    private fun createBuildGradle17() {
+        testProjectDir.newFile("build.gradle").appendText(
+            """
+                    plugins {
+                        id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+                        id 'application'
+                        id 'io.github.cdsap.kotlinprocess'
+                    }
+                    repositories {
+                        mavenCentral()
+                    }
+                    java {
+                        toolchain {
+                            languageVersion = JavaLanguageVersion.of(17)
+                        }
                     }
                 """.trimIndent()
         )
