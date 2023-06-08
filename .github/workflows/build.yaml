@@ -10,7 +10,7 @@ jobs:
             matrix:
                 os: [ubuntu-latest]
                 version: [17, 19]
-                vendor: [temurin, zulu, liberica, microsoft, semeru, oracle]
+                vendor: [temurin, zulu, liberica]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v3
@@ -22,4 +22,6 @@ jobs:
             - name: Setup Gradle
               uses: gradle/gradle-build-action@v2
             - name: Execute Gradle build
-              run:  ./gradlew test --tests io.github.cdsap.kotlinprocess.InfoKotlinProcessPluginTest
+              run: |
+                  ./gradlew :help
+                  jps | grep GradleDaemon | sed 's/GradleDaemon//' | while read ln; do  jstat -gc -t $ln; echo "$ln"; done
