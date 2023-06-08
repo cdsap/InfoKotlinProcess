@@ -138,6 +138,60 @@ class InfoKotlinProcessPluginTest {
     }
 
     @Test
+    fun test1OutputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinGCJvm() {
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
+            org.gradle.jvmargs=-Xmx258m -XX:+UseParallelGC -Dfile.encoding=UTF-8
+            kotlin.daemon.jvmargs=-Xmx600m -XX:+UseParallelGC
+        """.trimIndent()
+        )
+        createBuildGradle()
+        createKotlinClass()
+
+        gradleVersions.forEach {
+            val build = simpleKotlinCompileBuild(it)
+            assertTerminalOutput(build)
+            assertTrue(build.output.contains("PARALLEL"))
+        }
+    }
+
+    @Test
+    fun test4OutputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinGCJvm() {
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
+            org.gradle.jvmargs=-Xmx258m -XX:+UseParallelGC -Dfile.encoding=UTF-8
+            kotlin.daemon.jvmargs=-Xmx600m -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC
+        """.trimIndent()
+        )
+        createBuildGradle()
+        createKotlinClass()
+
+        gradleVersions.forEach {
+            val build = simpleKotlinCompileBuild(it)
+            assertTerminalOutput(build)
+            assertTrue(build.output.contains("PARALLEL"))
+        }
+    }
+
+    @Test
+    fun testsstputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinGCJvm() {
+        testProjectDir.newFile("gradle.properties").writeText(
+            """
+            org.gradle.jvmargs=-Xmx258m -XX:+UseParallelGC -Dfile.encoding=UTF-8
+            kotlin.daemon.jvmargs=-Xmx600m -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC
+        """.trimIndent()
+        )
+        createBuildGradle()
+        createKotlinClass()
+
+        gradleVersions.forEach {
+            val build = simpleKotlinCompileBuild(it)
+            assertTerminalOutput(build)
+            assertTrue(build.output.contains("PARALLEL"))
+        }
+    }
+
+    @Test
     fun testOutputIsGeneratedWhenPluginIsAppliedWithJvmGCArgsAndKotlinZ1Jvm() {
         Assume.assumeTrue(Runtime.version().feature() >= 15)
 
