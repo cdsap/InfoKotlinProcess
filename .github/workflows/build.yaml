@@ -8,8 +8,8 @@ jobs:
         timeout-minutes: 300
         strategy:
             matrix:
-                os: [ubuntu-latest,macos-latest]
-                version: [11, 17, 19]
+                os: [ubuntu-latest]
+                version: [17, 19]
                 vendor: [temurin, zulu, liberica, microsoft, semeru, oracle]
         runs-on: ${{ matrix.os }}
         steps:
