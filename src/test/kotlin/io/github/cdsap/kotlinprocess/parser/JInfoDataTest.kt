@@ -74,4 +74,30 @@ class JInfoDataTest {
         assertTrue(result.containsKey("12345"))
         assertTrue(result["12345"]?.max == 2.0)
     }
+
+    @Test
+    fun testGcTypeIsRetrieved() {
+        val jInfoData = JInfoData()
+        val output = """
+            -XX:CICompilerCount=4 -XX:InitialHeapSize=1073741824 -XX:MaxHeapSize=17179869184 -XX:MinHeapDeltaBytes=2097152 -XX:MinHeapSize=8388608 -XX:NonNMethodCodeHeapSize=5839564 -XX:NonProfiledCodeHeapSize=122909338 -XX:ProfiledCodeHeapSize=122909338 -XX:ReservedCodeCacheSize=251658240 -XX:+SegmentedCodeCache -XX:SoftMaxHeapSize=17179869184 -XX:+UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseNUMA -XX:-UseNUMAInterleaving -XX:+UseZGC
+            12345
+            """.trimIndent()
+        val result = jInfoData.process(output)
+        assertTrue(result.size == 1)
+        assertTrue(result.containsKey("12345"))
+        assertTrue(result["12345"]?.gcType == "-XX:+UseZGC")
+    }
+
+    @Test
+    fun testNotSupportedGcTypeIsEmpty() {
+        val jInfoData = JInfoData()
+        val output = """
+            -XX:CICompilerCount=4 -XX:InitialHeapSize=1073741824 -XX:MaxHeapSize=17179869184 -XX:MinHeapDeltaBytes=2097152 -XX:MinHeapSize=8388608 -XX:NonNMethodCodeHeapSize=5839564 -XX:NonProfiledCodeHeapSize=122909338 -XX:ProfiledCodeHeapSize=122909338 -XX:ReservedCodeCacheSize=251658240 -XX:+SegmentedCodeCache -XX:SoftMaxHeapSize=17179869184 -XX:+UseCompressedClassPointers -XX:-UseCompressedOops -XX:-UseNUMA -XX:-UseNUMAInterleaving -XX:+CCGC
+            12345
+            """.trimIndent()
+        val result = jInfoData.process(output)
+        assertTrue(result.size == 1)
+        assertTrue(result.containsKey("12345"))
+        assertTrue(result["12345"]?.gcType == "")
+    }
 }

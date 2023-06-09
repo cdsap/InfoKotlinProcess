@@ -84,4 +84,36 @@ class JStatDataTest {
         assertTrue(result["12345"]?.usage == (30.0 + 40.0 + 60.0 + 80.3))
         assertTrue(result["12345"]?.uptime == 1000.0)
     }
+
+    @Test
+    fun testCGCIsNotPresent() {
+        val jStatData = JStatData()
+        val result = jStatData.process(
+            """
+            Timestamp        S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT     GCT
+                    15166.0  0.0   12288.0  0.0   12288.0 89088.0  65536.0   207872.0   87565.3   95824.0 84374.6 11264.0 8760.1     87    0.315   1      0.163   0.663
+            42050
+        """.trimIndent()
+        )
+        assertTrue(result.containsKey("42050"))
+        assertTrue(result["42050"]?.uptime == 15166.0)
+        assertTrue(result["42050"]?.gcTime == 0.663)
+    }
+
+    @Test
+    fun testZGCIsParsedWithoutSurvivorSpace() {
+        val jStatData = JStatData()
+        val result = jStatData.process(
+            """
+            Timestamp   S0C    S1C    S0U    S1U      EC       EU        OC         OU       MC     MU    CCSC   CCSU   YGC     YGCT    FGC    FGCT    CGC    CGCT     GCT
+              1000.0     -     -   30.0   40.0    50.0     60.0       70.0         2        3        1   2     3      4        5       150   160.163  170     1       190.663
+            42050
+                   """.trimIndent()
+        )
+        assertTrue(result.containsKey("42050"))
+        assertTrue(result["42050"]?.uptime == 1000.0)
+        assertTrue(result["42050"]?.capacity == 73.0)
+        assertTrue(result["42050"]?.gcTime == 190.663)
+        assertTrue(result["42050"]?.usage == 3.0)
+    }
 }

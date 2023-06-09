@@ -4,6 +4,5 @@ data class ProcessJstat(
     val usage: Double,
     val capacity: Double,
     val gcTime: Double,
-    val uptime: Double,
-    val typeGC: String
+    val uptime: Double
 )

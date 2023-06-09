@@ -133,7 +133,7 @@ class InfoKotlinProcessPluginTest {
         gradleVersions.forEach {
             val build = simpleKotlinCompileBuild(it)
             assertTerminalOutput(build)
-            assertTrue(build.output.contains("PARALLEL"))
+            assertTrue(build.output.contains("UseParallelGC"))
         }
     }
 
