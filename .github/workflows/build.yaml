@@ -11,7 +11,7 @@ jobs:
                 os: [ubuntu-latest]
                 version: [17, 19]
                 vendor: [temurin, zulu, liberica]
-                gradle_ops: ["-Xmx2048m -Dfile.encoding=UTF-8 -XX:+UseParallelGC", "-Xmx2048m -Dfile.encoding=UTF-8"]
+                gradle_ops: ["-Xmx2048m -Dfile.encoding=UTF-8 -XX:+UseParallelGC", "-Xmx2048m -Dfile.encoding=UTF-8","-XX:+UnlockExperimentalVMOptions -XX:+UseZGC","-XX:+UseG1GC","-XX:+UseSerialGC"]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v3
