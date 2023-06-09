@@ -24,5 +24,5 @@ jobs:
             - name: Execute Gradle build
               run: |
                   ./gradlew :help
-                  where jstat
                   jps | grep GradleDaemon | sed 's/GradleDaemon//' | while read ln; do  jstat -gc -t $ln; echo "$ln"; done
+                  jps | grep GradleDaemon | sed 's/GradleDaemon//' | while read ln; do  jinfo $ln; echo "$ln"; done
