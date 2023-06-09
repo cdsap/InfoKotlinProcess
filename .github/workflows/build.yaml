@@ -11,6 +11,7 @@ jobs:
                 os: [ubuntu-latest]
                 version: [17, 19]
                 vendor: [temurin, zulu, liberica]
+                gradle_ops: ["-Xmx2048m -Dfile.encoding=UTF-8 -XX:+UseParallelGC", "-Xmx2048m -Dfile.encoding=UTF-8"]
         runs-on: ${{ matrix.os }}
         steps:
             - uses: actions/checkout@v3
@@ -26,3 +27,5 @@ jobs:
                   ./gradlew :help
                   jps | grep GradleDaemon | sed 's/GradleDaemon//' | while read ln; do  jstat -gc -t $ln; echo "$ln"; done
                   jps | grep GradleDaemon | sed 's/GradleDaemon//' | while read ln; do  jinfo $ln; echo "$ln"; done
+              env:
+                GRADLE_OPTS: ${{ matrix.gradle_ops }}
