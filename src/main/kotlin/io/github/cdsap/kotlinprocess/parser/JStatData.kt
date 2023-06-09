@@ -21,15 +21,18 @@ class JStatData {
         for (i in 0 until numberOfProcessesDetected) {
             val rawHeaders = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
             val rawValues = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
-            val mapOfValues = getMapValues(rawHeaders, rawValues)
-            val process = lines[++currentIndex].split("\\s+".toRegex())
-            currentIndex++
-            processes[process.first()] = ProcessJstat(
-                capacity = getCapacity(mapOfValues),
-                usage = getUsage(mapOfValues),
-                gcTime = gcTime(mapOfValues),
-                uptime = uptime(mapOfValues)
-            )
+            if (rawHeaders.size == rawValues.size) {
+                val mapOfValues = getMapValues(rawHeaders, rawValues)
+                val process = lines[++currentIndex].split("\\s+".toRegex())
+                currentIndex++
+
+                processes[process.first()] = ProcessJstat(
+                    capacity = getCapacity(mapOfValues),
+                    usage = getUsage(mapOfValues),
+                    gcTime = gcTime(mapOfValues),
+                    uptime = uptime(mapOfValues)
+                )
+            }
         }
         return processes
     }

@@ -56,7 +56,7 @@ class JStatDataTest {
             42050
         """.trimIndent()
         )
-        assertTrue(result.isEmpty())
+        assertTrue(result["42050"]?.uptime == 0.0)
     }
 
     @Test
