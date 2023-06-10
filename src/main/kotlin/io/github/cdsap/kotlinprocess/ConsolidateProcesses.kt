@@ -26,7 +26,7 @@ class ConsolidateProcesses {
                             capacity = jStatData[it.key]?.capacity?.toGigsFromKb()!!,
                             gcTime = jStatData[it.key]?.gcTime?.toMinutes()!!,
                             uptime = jStatData[it.key]?.uptime?.toMinutes()!!,
-                            type = jStatData[it.key]?.typeGC!!
+                            type = it.value.gcType
                         )
                     )
                 }

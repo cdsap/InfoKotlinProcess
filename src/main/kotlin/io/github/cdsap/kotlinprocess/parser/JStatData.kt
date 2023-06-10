@@ -21,151 +21,108 @@ class JStatData {
         for (i in 0 until numberOfProcessesDetected) {
             val rawHeaders = lines[currentIndex].split("\\s+".toRegex()).filter { it != "" }
             val rawValues = lines[++currentIndex].split("\\s+".toRegex()).filter { it != "" }
-
-            val typeOfCollector = getCollector(rawHeaders, rawValues)
-
-            val (headers, value) = preparePairsByCollector(typeOfCollector, rawHeaders, rawValues)
-
-            if (headers.size == value.size && checkValuesAraValid(value)) {
+            if (rawHeaders.size == rawValues.size) {
+                val mapOfValues = getMapValues(rawHeaders, rawValues)
                 val process = lines[++currentIndex].split("\\s+".toRegex())
-                val jspMapValues = mutableMapOf<String, Double>()
-                var aux = 0
                 currentIndex++
 
-                headers.forEach {
-                    jspMapValues[it] = value[aux].toDouble()
-                    aux++
-                }
                 processes[process.first()] = ProcessJstat(
-                    capacity = totalCapacity(typeOfCollector, jspMapValues),
-                    usage = usage(typeOfCollector, jspMapValues),
-                    gcTime = gcTime(jspMapValues),
-                    uptime = uptime(jspMapValues),
-                    typeGC = typeOfCollector.name
+                    capacity = getCapacity(mapOfValues),
+                    usage = getUsage(mapOfValues),
+                    gcTime = gcTime(mapOfValues),
+                    uptime = uptime(mapOfValues)
                 )
-
             }
         }
         return processes
     }
 
-    private fun getCollector(rawHeaders: List<String>, rawValues: List<String>): TypeCollector {
-        val socHeaderPosition = rawHeaders.indexOf("S0C")
-        val soc = rawValues[socHeaderPosition]
-        if (soc == "-") {
-            return TypeCollector.Z
-        } else {
-            val socCGC = rawHeaders.indexOf("CGC")
-            val cgc = rawValues[socCGC]
-            if (cgc == "-") {
-                return TypeCollector.PARALLEL
-            } else {
-                return TypeCollector.G1
-            }
+    private fun getMapValues(rawHeaders: List<String>, rawValues: List<String>): Map<String, String> {
+        val parsedValues = mutableMapOf<String, String>()
+        var i = 0
+        rawHeaders.forEach {
+            parsedValues[it] = rawValues[i]
+            i++
         }
-    }
-
-    private fun preparePairsByCollector(
-        typeOfCollector: TypeCollector,
-        rawHeaders: List<String>,
-        rawValues: List<String>
-    ): Pair<List<String>, List<String>> {
-        when (typeOfCollector) {
-            TypeCollector.G1 -> {
-                return Pair(rawHeaders, rawValues)
-            }
-
-            TypeCollector.PARALLEL -> {
-                val concurrentGCTime = rawHeaders.indexOf("CGC")
-                val concurrentGCTimeTotal = rawHeaders.indexOf("CGCT")
-
-                val headers = rawHeaders.toMutableList()
-                headers.removeAt(concurrentGCTime)
-                headers.removeAt(concurrentGCTimeTotal - 1)
-                val value = rawValues.toMutableList()
-                value.removeAt(concurrentGCTime)
-                value.removeAt(concurrentGCTimeTotal - 1)
-                return Pair(headers.toList(), value.toList())
-            }
-
-            TypeCollector.Z -> {
-                val soc = rawHeaders.indexOf("S0C")
-                val s1c = rawHeaders.indexOf("S1C")
-                val sou = rawHeaders.indexOf("S0U")
-                val s1u = rawHeaders.indexOf("S1U")
-                val ec = rawHeaders.indexOf("EC")
-                val eu = rawHeaders.indexOf("EU")
-                val ygc = rawHeaders.indexOf("YGC")
-                val ygct = rawHeaders.indexOf("YGCT")
-                val fgc = rawHeaders.indexOf("FGC")
-                val fgct = rawHeaders.indexOf("FGCT")
-
-                val headers = rawHeaders.toMutableList()
-                headers.removeAt(soc)
-                headers.removeAt(s1c - 1)
-                headers.removeAt(sou - 2)
-                headers.removeAt(s1u - 3)
-                headers.removeAt(ec - 4)
-                headers.removeAt(eu - 5)
-                headers.removeAt(ygc - 6)
-                headers.removeAt(ygct - 7)
-                headers.removeAt(fgc - 8)
-                headers.removeAt(fgct - 9)
-
-                val value = rawValues.toMutableList()
-                value.removeAt(soc)
-                value.removeAt(s1c - 1)
-                value.removeAt(sou - 2)
-                value.removeAt(s1u - 3)
-                value.removeAt(ec - 4)
-                value.removeAt(eu - 5)
-                value.removeAt(ygc - 6)
-                value.removeAt(ygct - 7)
-                value.removeAt(fgc - 8)
-                value.removeAt(fgct - 9)
-                return Pair(headers.toList(), value.toList())
-            }
-        }
-    }
-
-    private fun checkValuesAraValid(jspMapValues: List<String>): Boolean {
-        jspMapValues.forEach {
-            try {
-                it.toDouble()
-            } catch (e: java.lang.NumberFormatException) {
-                return false
-            }
-        }
-        return true
-    }
-
-    private fun totalCapacity(typeOfCollector: TypeCollector, jspMapValues: Map<String, Double>): Double {
-        if(typeOfCollector == TypeCollector.Z) {
-            return jspMapValues["OC"]!! + jspMapValues["MC"]!!
-        } else {
-            return jspMapValues["EC"]!! + jspMapValues["OC"]!! + jspMapValues["S0C"]!! + jspMapValues["S1C"]!!
-        }
-    }
-
-    private fun usage(typeOfCollector: TypeCollector, jspMapValues: Map<String, Double>): Double {
-        if(typeOfCollector == TypeCollector.Z) {
-            return jspMapValues["OU"]!! + jspMapValues["MU"]!!
-        } else {
-            return jspMapValues["S0U"]!! + jspMapValues["S1U"]!! + jspMapValues["EU"]!! + jspMapValues["OU"]!!
-        }
-    }
-
-    private fun gcTime(jspMapValues: Map<String, Double>): Double {
-        return jspMapValues["GCT"]!!
-    }
-
-    private fun uptime(jspMapValues: Map<String, Double>): Double {
-        return jspMapValues["Timestamp"]!!
+        return parsedValues
     }
 }
 
-enum class TypeCollector {
-    G1,
-    PARALLEL,
-    Z
+private fun getCapacity(values: Map<String, String>): Double {
+    // ZGC is not Current survivor space
+    if (values["S0C"] == "-") {
+        val oc = values["OC"]
+        val mc = values["MC"]
+        if (oc != null && mc != null) {
+            val ocNumber = oc.jstatValueToDouble()
+            val mcNumber = mc.jstatValueToDouble()
+            return mcNumber + ocNumber
+        } else {
+            return 0.0
+        }
+    } else {
+        val ec = values["EC"]
+        val oc = values["OC"]
+        val soc = values["S0C"]
+        val s1c = values["S1C"]
+        if (ec != null && oc != null && soc != null && s1c != null) {
+            val ecNumber = ec.jstatValueToDouble()
+            val ocNumber = oc.jstatValueToDouble()
+            val socNumber = soc.jstatValueToDouble()
+            val s1cNumber = s1c.jstatValueToDouble()
+            return ecNumber + ocNumber + socNumber + s1cNumber
+
+        } else {
+            return 0.0
+        }
+    }
+}
+
+private fun getUsage(values: Map<String, String>): Double {
+    // ZGC is not using Eden region
+    if (values["S0C"] == "-") {
+        val ou = values["OU"]
+        val mu = values["MU"]
+        if (ou != null && mu != null) {
+            val ouNumber = ou.jstatValueToDouble()
+            val muNumber = mu.jstatValueToDouble()
+            return muNumber + ouNumber
+        } else {
+            return 0.0
+        }
+    } else {
+        val eu = values["EU"]
+        val ou = values["OU"]
+        val sou = values["S0U"]
+        val s1u = values["S1U"]
+        if (eu != null && ou != null && sou != null && s1u != null) {
+            val euNumber = eu.jstatValueToDouble()
+            val ouNumber = ou.jstatValueToDouble()
+            val souNumber = sou.jstatValueToDouble()
+            val s1uNumber = s1u.jstatValueToDouble()
+            return euNumber + ouNumber + souNumber + s1uNumber
+
+        } else {
+            return 0.0
+        }
+
+    }
+}
+
+private fun gcTime(values: Map<String, String>): Double {
+    val gct = values["GCT"]
+    return gct?.jstatValueToDouble() ?: 0.0
+}
+
+private fun uptime(values: Map<String, String>): Double {
+    val timeStamp = values["Timestamp"]
+    return timeStamp?.jstatValueToDouble() ?: 0.0
+}
+
+fun String.jstatValueToDouble(): Double {
+    return try {
+        this.toDouble()
+    } catch (e: java.lang.NumberFormatException) {
+        0.0
+    }
 }
