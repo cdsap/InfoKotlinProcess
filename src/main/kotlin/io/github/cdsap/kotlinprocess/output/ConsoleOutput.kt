@@ -2,8 +2,7 @@ package io.github.cdsap.kotlinprocess.output
 
 import com.jakewharton.picnic.TextAlignment
 import com.jakewharton.picnic.table
-import io.github.cdsap.kotlinprocess.model.Process
-import io.github.cdsap.kotlinprocess.toMinutes
+import io.github.cdsap.jdk.tools.parser.model.Process
 
 class ConsoleOutput(private val processes: List<Process>) {
     fun print() {
@@ -38,7 +37,7 @@ class ConsoleOutput(private val processes: List<Process>) {
                             cell("${it.usage} Gb")
                             cell("${it.capacity} Gb")
                             cell("${it.gcTime} minutes")
-                            cell(it.type)
+                            cell(it.typeGc)
                             cell("${it.uptime} minutes")
                         }
                     }

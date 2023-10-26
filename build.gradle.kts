@@ -15,6 +15,8 @@ java {
 }
 
 dependencies {
+    implementation("io.github.cdsap:jdk-tools-parser:0.1.1)
+    implementation("io.github.cdsap:jdk-value-source-process:0.1.0")
     implementation("com.jakewharton.picnic:picnic:0.6.0")
     implementation("com.gradle.enterprise:com.gradle.enterprise.gradle.plugin:3.12.3")
     testImplementation("junit:junit:4.13.2")
