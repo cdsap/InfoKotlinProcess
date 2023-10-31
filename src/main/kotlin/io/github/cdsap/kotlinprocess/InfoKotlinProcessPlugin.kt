@@ -1,12 +1,17 @@
 package io.github.cdsap.kotlinprocess
 
 import com.gradle.scan.plugin.BuildScanExtension
+import io.github.cdsap.jdk.tools.parser.ConsolidateProcesses
+import io.github.cdsap.jdk.tools.parser.model.TypeProcess
 import io.github.cdsap.kotlinprocess.output.BuildScanOutput
+import io.github.cdsap.valuesourceprocess.jInfo
+import io.github.cdsap.valuesourceprocess.jStat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
+
 
 class InfoKotlinProcessPlugin : Plugin<Project> {
+    private val nameProcess = "KotlinCompileDaemon"
     override fun apply(target: Project) {
         target.gradle.rootProject {
             val buildScanExtension = extensions.findByType(com.gradle.scan.plugin.BuildScanExtension::class.java)
@@ -22,8 +27,8 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
         project.gradle.sharedServices.registerIfAbsent(
             "kotlinProcessService", InfoKotlinProcessBuildService::class.java
         ) {
-            parameters.jInfoProvider = project.jInfo()
-            parameters.jStatProvider = project.jStat()
+            parameters.jInfoProvider = project.jInfo(nameProcess)
+            parameters.jStatProvider = project.jStat(nameProcess)
         }.get()
     }
 
@@ -31,26 +36,12 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
         project: Project,
         buildScanExtension: BuildScanExtension
     ) {
-        val jStat = project.jStat()
-        val jInfo = project.jInfo()
+        val jStat = project.jStat(nameProcess)
+        val jInfo = project.jInfo(nameProcess)
 
         buildScanExtension.buildFinished {
-            val processes = ConsolidateProcesses().consolidate(jStat.get(), jInfo.get())
+            val processes = ConsolidateProcesses().consolidate(jStat.get(), jInfo.get(), TypeProcess.Kotlin)
             BuildScanOutput(buildScanExtension, processes).addProcessesInfoToBuildScan()
         }
-    }
-}
-
-fun Project.jStat(): Provider<String> {
-    return execute("jps | grep KotlinCompileDaemon | sed 's/KotlinCompileDaemon//' | while read ln; do  jstat -gc -t \$ln; echo \"\$ln\"; done")
-}
-
-fun Project.jInfo(): Provider<String> {
-    return execute("jps | grep KotlinCompileDaemon | sed 's/KotlinCompileDaemon//' | while read ln; do  jinfo \$ln  | grep \"XX:MaxHeapSize\"; echo \"\$ln\";  done")
-}
-
-fun Project.execute(command: String): Provider<String> {
-    return providers.of(CommandLineWithOutputValue::class.java) {
-        parameters.commands.set(command)
     }
 }

@@ -1,7 +1,7 @@
 package io.github.cdsap.kotlinprocess.output
 
 import com.gradle.scan.plugin.BuildScanExtension
-import io.github.cdsap.kotlinprocess.model.Process
+import io.github.cdsap.jdk.tools.parser.model.Process
 
 class BuildScanOutput(
     private val buildScanExtension: BuildScanExtension,
@@ -32,7 +32,7 @@ class BuildScanOutput(
             )
             buildScanExtension.value(
                 "Kotlin-Process-${it.pid}-gcType",
-                it.type
+                it.typeGc
             )
         }
     }
