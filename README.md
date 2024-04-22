@@ -9,7 +9,7 @@ Apply the plugin in the main `build.gradle(.kts)` configuration file:
 Using the plugins DSL:
 ``` groovy
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.1.5"
+  id("io.github.cdsap.kotlinprocess") version "0.1.6"
 }
 ```
 
@@ -20,7 +20,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath("io.github.cdsap:infokotlinprocess:0.1.5")
+    classpath("io.github.cdsap:infokotlinprocess:0.1.6")
   }
 }
 
@@ -31,7 +31,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 Using the plugins DSL:
 ``` groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.1.5"
+  id "io.github.cdsap.kotlinprocess" version "0.1.6"
 }
 
 ```
@@ -43,7 +43,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath "io.github.cdsap:infokotlinprocess:0.1.5"
+    classpath "io.github.cdsap:infokotlinprocess:0.1.6"
   }
 }
 
@@ -73,9 +73,11 @@ BUILD SUCCESSFUL in 35s
 
 ```
 
+
 ## Requirements
 * Gradle 7.5
 
 ## Libraries
-* com.gradle.enterprise:com.gradle.enterprise.gradle.plugin
-* com.jakewharton.picnic:picnic
+* `com.gradle:develocity-gradle-plugin`
+* `com.gradle.enterprise:com.gradle.enterprise.gradle.plugin`
+* `com.jakewharton.picnic:picnic`
