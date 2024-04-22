@@ -76,15 +76,13 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
         testProjectDir.newFile("settings.gradle").appendText(
             """
                 plugins {
-                    id 'com.gradle.enterprise' version '3.17.2'
+                    id 'com.gradle.develocity' version '3.17.2'
                 }
-                gradleEnterprise {
+                develocity {
                     server = "${System.getenv("GE_URL")}"
                     accessKey="${System.getenv("GE_API_KEY")}"
                     buildScan {
-                        capture { taskInputFiles = true }
-                        publishAlways()
-
+                        publishing { true }
                     }
                 }
             """.trimIndent()
