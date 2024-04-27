@@ -56,6 +56,8 @@ Build Scan:
 
 ![](images/buildscan.png)
 
+The field `Usage` represents the value obtained at the end of the build using `jstat` on the JVM process. 
+
 ### Build Output
 If you are not using Gradle Enterprise, the information about the Kotlin processes will be included at the end of the build:
 ```
