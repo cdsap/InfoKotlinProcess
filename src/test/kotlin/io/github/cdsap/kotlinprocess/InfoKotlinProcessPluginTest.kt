@@ -10,7 +10,7 @@ import org.junit.rules.TemporaryFolder
 
 class InfoKotlinProcessPluginTest {
 
-    private val gradleVersions = listOf("8.12.1")
+    private val gradleVersions = listOf("8.6", "8.7", "8.12.1")
 
     @Rule
     @JvmField
