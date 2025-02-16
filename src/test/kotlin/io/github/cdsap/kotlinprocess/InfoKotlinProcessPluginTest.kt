@@ -10,7 +10,7 @@ import org.junit.rules.TemporaryFolder
 
 class InfoKotlinProcessPluginTest {
 
-    private val gradleVersions = listOf("7.6.2", "8.1.1", "8.6", "8.7")
+    private val gradleVersions = listOf("8.12.1")
 
     @Rule
     @JvmField
@@ -35,19 +35,21 @@ class InfoKotlinProcessPluginTest {
         gradleVersions.forEach {
             val firstBuild = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments("compileKotlin", "--configuration-cache")
+                .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
                 .withPluginClasspath()
                 .withGradleVersion(it)
                 .build()
             val secondBuild = GradleRunner.create()
                 .withProjectDir(testProjectDir.root)
-                .withArguments("compileKotlin", "--configuration-cache")
+                .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
                 .withPluginClasspath()
                 .withGradleVersion(it)
                 .build()
-
             assertTrue(firstBuild.output.contains("Configuration cache entry stored"))
+            assertTrue(firstBuild.output.contains("Kotlin processes"))
             assertTrue(secondBuild.output.contains("Configuration cache entry reused."))
+            assertTrue(secondBuild.output.contains("Kotlin processes"))
+
         }
     }
 

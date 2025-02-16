@@ -9,7 +9,7 @@ Apply the plugin in the main `build.gradle(.kts)` configuration file:
 Using the plugins DSL:
 ``` groovy
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.1.6"
+  id("io.github.cdsap.kotlinprocess") version "0.1.7"
 }
 ```
 
@@ -20,7 +20,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath("io.github.cdsap:infokotlinprocess:0.1.6")
+    classpath("io.github.cdsap:infokotlinprocess:0.1.7")
   }
 }
 
@@ -31,7 +31,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 Using the plugins DSL:
 ``` groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.1.6"
+  id "io.github.cdsap.kotlinprocess" version "0.1.7"
 }
 
 ```
@@ -43,7 +43,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath "io.github.cdsap:infokotlinprocess:0.1.6"
+    classpath "io.github.cdsap:infokotlinprocess:0.1.7"
   }
 }
 
@@ -56,7 +56,7 @@ Build Scan:
 
 ![](images/buildscan.png)
 
-The field `Usage` represents the value obtained at the end of the build using `jstat` on the JVM process. 
+The field `Usage` represents the value obtained at the end of the build using `jstat` on the JVM process.
 
 ### Build Output
 If you are not using Gradle Enterprise, the information about the Kotlin processes will be included at the end of the build:
