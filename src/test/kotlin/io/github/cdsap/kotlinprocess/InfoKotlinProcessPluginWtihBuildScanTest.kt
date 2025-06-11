@@ -22,7 +22,7 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
         testProjectDir.newFile("settings.gradle").appendText(
             """
                 plugins {
-                    id 'com.gradle.enterprise' version '3.12.2'
+                    id 'com.gradle.enterprise' version '4.0.2'
                 }
                 gradleEnterprise {
                     server = "${System.getenv("GE_URL")}"
