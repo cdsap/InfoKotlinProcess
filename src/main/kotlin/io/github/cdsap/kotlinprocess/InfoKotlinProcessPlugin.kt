@@ -1,12 +1,10 @@
 package io.github.cdsap.kotlinprocess
 
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
-import com.gradle.scan.plugin.BuildScanExtension
 import io.github.cdsap.jdk.tools.parser.ConsolidateProcesses
 import io.github.cdsap.jdk.tools.parser.model.Process
 import io.github.cdsap.jdk.tools.parser.model.TypeProcess
 import io.github.cdsap.kotlinprocess.output.DevelocityValues
-import io.github.cdsap.kotlinprocess.output.EnterpriseValues
 import io.github.cdsap.valuesourceprocess.jInfo
 import io.github.cdsap.valuesourceprocess.jStat
 import org.gradle.api.Plugin
@@ -22,12 +20,9 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
         target.gradle.rootProject {
 
             val develocityConfiguration = extensions.findByType(DevelocityConfiguration::class.java)
-            val enterpriseExtension = extensions.findByType(com.gradle.scan.plugin.BuildScanExtension::class.java)
 
             if (develocityConfiguration != null) {
                 buildScanDevelocityReporting(project, develocityConfiguration)
-            } else if (enterpriseExtension != null) {
-                buildScanEnterpriseReporting(project, enterpriseExtension)
             } else {
                 consoleReporting(target)
             }
@@ -42,18 +37,6 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
             parameters.jStatProvider = project.jStat(nameProcess)
         }
         project.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(service)
-    }
-
-    private fun buildScanEnterpriseReporting(
-        project: Project,
-        buildScanExtension: BuildScanExtension
-    ) {
-        val (jStat, jInfo) = providerPair(project)
-
-        buildScanExtension.buildFinished {
-            val processes = processes(jStat, jInfo)
-            EnterpriseValues(buildScanExtension, processes).addProcessesInfoToBuildScan()
-        }
     }
 
     private fun buildScanDevelocityReporting(
