@@ -9,7 +9,7 @@ Apply the plugin in the main `build.gradle(.kts)` configuration file:
 Using the plugins DSL:
 ``` groovy
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.1.7"
+  id("io.github.cdsap.kotlinprocess") version "0.2.0"
 }
 ```
 
@@ -20,7 +20,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath("io.github.cdsap:infokotlinprocess:0.1.7")
+    classpath("io.github.cdsap:infokotlinprocess:0.2.0")
   }
 }
 
@@ -31,7 +31,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 Using the plugins DSL:
 ``` groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.1.7"
+  id "io.github.cdsap.kotlinprocess" version "0.2.0"
 }
 
 ```
@@ -43,7 +43,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath "io.github.cdsap:infokotlinprocess:0.1.7"
+    classpath "io.github.cdsap:infokotlinprocess:0.2.0"
   }
 }
 
@@ -51,7 +51,7 @@ apply plugin: "io.github.cdsap.kotlinprocess"
 ```
 ## Output
 ### Build Scans
-If you are using Gradle Enterprise, the information about the Kotlin processes will be included as custom value in the
+If you are using Develocity, the information about the Kotlin processes will be included as custom value in the
 Build Scan:
 
 ![](images/buildscan.png)
@@ -59,7 +59,7 @@ Build Scan:
 The field `Usage` represents the value obtained at the end of the build using `jstat` on the JVM process.
 
 ### Build Output
-If you are not using Gradle Enterprise, the information about the Kotlin processes will be included at the end of the build:
+If you are not using Develocity, the information about the Kotlin processes will be included at the end of the build:
 ```
 > Task :core:ui:compileProdDebugKotlin
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -81,5 +81,4 @@ BUILD SUCCESSFUL in 35s
 
 ## Libraries
 * `com.gradle:develocity-gradle-plugin`
-* `com.gradle.enterprise:com.gradle.enterprise.gradle.plugin`
 * `com.jakewharton.picnic:picnic`
