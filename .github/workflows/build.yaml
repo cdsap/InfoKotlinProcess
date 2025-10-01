@@ -19,7 +19,7 @@ jobs:
                   java-version:  ${{ matrix.version }}
 
             - name: Setup Gradle
-              uses: gradle/actions/setup-gradle@v4
+              uses: gradle/actions/setup-gradle@v5
             - name: Execute Gradle build
               run:  ./gradlew test -PexcludeTests=*.InfoKotlinProcessPluginTest
               env:
@@ -42,6 +42,6 @@ jobs:
                   java-version:  ${{ matrix.version }}
 
             - name: Setup Gradle
-              uses: gradle/actions/setup-gradle@v4
+              uses: gradle/actions/setup-gradle@v5
             - name: Execute Gradle build
               run:  ./gradlew test --tests io.github.cdsap.kotlinprocess.InfoKotlinProcessPluginTest
