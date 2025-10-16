@@ -1,21 +1,14 @@
 package io.github.cdsap.kotlinprocess
 
-import com.gradle.develocity.agent.gradle.DevelocityConfiguration
-import io.github.cdsap.jdk.tools.parser.ConsolidateProcesses
-import io.github.cdsap.jdk.tools.parser.model.Process
-import io.github.cdsap.jdk.tools.parser.model.TypeProcess
-import io.github.cdsap.kotlinprocess.output.DevelocityValues
 import io.github.cdsap.valuesourceprocess.jInfo
 import io.github.cdsap.valuesourceprocess.jStat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.provider.Provider
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.support.serviceOf
 
 
 class InfoKotlinProcessPlugin : Plugin<Project> {
-    private val nameProcess = "KotlinCompileDaemon"
     override fun apply(target: Project) {
         target.gradle.rootProject {
 
@@ -25,8 +18,8 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
             } catch (_: ClassNotFoundException) {
                 false
             }
-            if (hasDevelocity && extensions.findByType(DevelocityConfiguration::class.java) != null) {
-                buildScanDevelocityReporting(project, extensions.findByType(DevelocityConfiguration::class.java)!!)
+            if (hasDevelocity ) {
+                DevelocityWrapperConfiguration().configureProjectWithDevelocity(target)
             } else {
                 consoleReporting(target)
             }
@@ -37,35 +30,9 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
         val service = project.gradle.sharedServices.registerIfAbsent(
             "kotlinProcessService", InfoKotlinProcessBuildService::class.java
         ) {
-            parameters.jInfoProvider = project.jInfo(nameProcess)
-            parameters.jStatProvider = project.jStat(nameProcess)
+            parameters.jInfoProvider = project.jInfo(Constants.KOTLIN_PROCESS_NAME)
+            parameters.jStatProvider = project.jStat(Constants.KOTLIN_PROCESS_NAME)
         }
         project.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(service)
-    }
-
-    private fun buildScanDevelocityReporting(
-        project: Project,
-        buildScanExtension: DevelocityConfiguration
-    ) {
-        val (jStat, jInfo) = providerPair(project)
-
-        buildScanExtension.buildScan.buildFinished {
-            val processes = processes(jStat, jInfo)
-            DevelocityValues(buildScanExtension, processes).addProcessesInfoToBuildScan()
-        }
-    }
-
-    private fun processes(
-        jStat: Provider<String>,
-        jInfo: Provider<String>
-    ): List<Process> {
-        val processes = ConsolidateProcesses().consolidate(jStat.get(), jInfo.get(), TypeProcess.Kotlin)
-        return processes
-    }
-
-    private fun providerPair(project: Project): Pair<Provider<String>, Provider<String>> {
-        val jStat = project.jStat(nameProcess)
-        val jInfo = project.jInfo(nameProcess)
-        return Pair(jStat, jInfo)
     }
 }
