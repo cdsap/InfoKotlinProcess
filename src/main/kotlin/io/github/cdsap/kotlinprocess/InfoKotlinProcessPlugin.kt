@@ -19,10 +19,14 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.gradle.rootProject {
 
-            val develocityConfiguration = extensions.findByType(DevelocityConfiguration::class.java)
-
-            if (develocityConfiguration != null) {
-                buildScanDevelocityReporting(project, develocityConfiguration)
+            val hasDevelocity = try {
+                Class.forName("com.gradle.develocity.agent.gradle.DevelocityConfiguration")
+                true
+            } catch (_: ClassNotFoundException) {
+                false
+            }
+            if (hasDevelocity && extensions.findByType(DevelocityConfiguration::class.java) != null) {
+                buildScanDevelocityReporting(project, extensions.findByType(DevelocityConfiguration::class.java)!!)
             } else {
                 consoleReporting(target)
             }
