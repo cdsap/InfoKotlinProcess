@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.cdsap"
-version = "0.2.0"
+version = "0.3.0"
 
 java {
     toolchain {
@@ -18,7 +18,7 @@ dependencies {
     implementation("io.github.cdsap:jdk-tools-parser:0.1.1")
     implementation("io.github.cdsap:commandline-value-source:0.1.0")
     implementation("com.jakewharton.picnic:picnic:0.7.0")
-    implementation("com.gradle:develocity-gradle-plugin:4.2.2")
+    compileOnly("com.gradle:develocity-gradle-plugin:4.2.2")
     testImplementation("junit:junit:4.13.2")
 }
 tasks.withType<Test>().configureEach {
