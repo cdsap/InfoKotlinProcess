@@ -2,7 +2,7 @@ plugins {
     `java-gradle-plugin`
     `maven-publish`
     `kotlin-dsl`
-    id("com.gradle.plugin-publish") version "1.0.0-rc-1"
+    id("com.gradle.plugin-publish") version "2.0.0"
 }
 
 group = "io.github.cdsap"
