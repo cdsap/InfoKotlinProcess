@@ -1,7 +1,6 @@
 package io.github.cdsap.kotlinprocess
 
 import junit.framework.TestCase
-import org.gradle.internal.impldep.org.junit.Assume
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Rule
 import org.junit.Test
