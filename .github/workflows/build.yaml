@@ -4,6 +4,24 @@ on:
   push:
       branches: [main]
 jobs:
+    ktlint:
+        timeout-minutes: 300
+        runs-on: ubuntu-latest
+        steps:
+            -   uses: actions/checkout@v6
+            -   uses: actions/setup-java@v5
+                with:
+                    distribution: temurin
+                    java-version: 17
+
+            -   name: Setup Gradle
+                uses: gradle/actions/setup-gradle@v5
+            -   name: Execute Gradle build
+                run: ./gradlew ktlintCheck
+                env:
+                    GE_URL: ${{ secrets.GE_URL }}
+                    GE_API_KEY: ${{ secrets.GE_API_KEY }}
+
     prBranch:
         timeout-minutes: 300
         strategy:
@@ -25,6 +43,7 @@ jobs:
               env:
                 GE_URL: ${{ secrets.GE_URL }}
                 GE_API_KEY: ${{ secrets.GE_API_KEY }}
+
 
     integrationJavaTests:
         timeout-minutes: 300
