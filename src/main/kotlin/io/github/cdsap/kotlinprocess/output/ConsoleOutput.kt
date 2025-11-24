@@ -4,7 +4,9 @@ import com.jakewharton.picnic.TextAlignment
 import com.jakewharton.picnic.table
 import io.github.cdsap.jdk.tools.parser.model.Process
 
-class ConsoleOutput(private val processes: List<Process>) {
+class ConsoleOutput(
+    private val processes: List<Process>,
+) {
     fun print() {
         println(
             table {
@@ -42,6 +44,7 @@ class ConsoleOutput(private val processes: List<Process>) {
                         }
                     }
                 }
-            })
+            },
+        )
     }
 }

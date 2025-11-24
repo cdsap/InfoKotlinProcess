@@ -9,8 +9,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
 class InfoKotlinProcessPluginTest {
-
-    private val gradleVersions = listOf("8.7", "8.12.1","8.14.1")
+    private val gradleVersions = listOf("8.7", "8.12.1", "8.14.1")
 
     @Rule
     @JvmField
@@ -27,29 +26,31 @@ class InfoKotlinProcessPluginTest {
         }
     }
 
-
     @Test
     fun testPluginIsCompatibleWithConfigurationCacheWithoutGradleEnterprise() {
         createBuildGradle()
 
         gradleVersions.forEach {
-            val firstBuild = GradleRunner.create()
-                .withProjectDir(testProjectDir.root)
-                .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
-                .withPluginClasspath()
-                .withGradleVersion(it)
-                .build()
-            val secondBuild = GradleRunner.create()
-                .withProjectDir(testProjectDir.root)
-                .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
-                .withPluginClasspath()
-                .withGradleVersion(it)
-                .build()
+            val firstBuild =
+                GradleRunner
+                    .create()
+                    .withProjectDir(testProjectDir.root)
+                    .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
+                    .withPluginClasspath()
+                    .withGradleVersion(it)
+                    .build()
+            val secondBuild =
+                GradleRunner
+                    .create()
+                    .withProjectDir(testProjectDir.root)
+                    .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
+                    .withPluginClasspath()
+                    .withGradleVersion(it)
+                    .build()
             assertTrue(firstBuild.output.contains("Configuration cache entry stored"))
             assertTrue(firstBuild.output.contains("Kotlin processes"))
             assertTrue(secondBuild.output.contains("Configuration cache entry reused."))
             assertTrue(secondBuild.output.contains("Kotlin processes"))
-
         }
     }
 
@@ -58,7 +59,7 @@ class InfoKotlinProcessPluginTest {
         testProjectDir.newFile("gradle.properties").writeText(
             """
             org.gradle.jvmargs=-Xmx256m -Dfile.encoding=UTF-8
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         createBuildGradle()
@@ -76,7 +77,7 @@ class InfoKotlinProcessPluginTest {
             """
             org.gradle.jvmargs=-Xmx256m -Dfile.encoding=UTF-8
             kotlin.daemon.jvmargs=-Xmx128m
-        """.trimIndent()
+            """.trimIndent(),
         )
         createBuildGradle()
         createKotlinClass()
@@ -93,7 +94,7 @@ class InfoKotlinProcessPluginTest {
             """
             org.gradle.jvmargs=-Xmx256m -Dfile.encoding=UTF-8
             kotlin.daemon.jvmargs=-Xmx128m -XX:+UseParallelGC
-        """.trimIndent()
+            """.trimIndent(),
         )
         createBuildGradle()
         createKotlinClass()
@@ -109,7 +110,7 @@ class InfoKotlinProcessPluginTest {
         testProjectDir.newFile("gradle.properties").writeText(
             """
             org.gradle.jvmargs=-Xmx256m -XX:+UseParallelGC -Dfile.encoding=UTF-8
-        """.trimIndent()
+            """.trimIndent(),
         )
         createBuildGradle()
         createKotlinClass()
@@ -127,7 +128,7 @@ class InfoKotlinProcessPluginTest {
             """
             org.gradle.jvmargs=-Xmx258m -XX:+UseParallelGC -Dfile.encoding=UTF-8
             kotlin.daemon.jvmargs=-Xmx600m -XX:+UseParallelGC
-        """.trimIndent()
+            """.trimIndent(),
         )
         createBuildGradle()
         createKotlinClass()
@@ -147,7 +148,7 @@ class InfoKotlinProcessPluginTest {
             """
             org.gradle.jvmargs=-Xmx256m -XX:+UseParallelGC -Dfile.encoding=UTF-8
             kotlin.daemon.jvmargs=-Xmx750m  -XX:+UnlockExperimentalVMOptions -XX:+UseZGC
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         createBuildGradle17()
@@ -157,17 +158,18 @@ class InfoKotlinProcessPluginTest {
             val build = simpleKotlinCompileBuild(it)
             assertTerminalOutput(build)
             assertTrue(build.output.contains("Z"))
-
         }
     }
 
-    private fun simpleKotlinCompileBuild(it: String): BuildResult = GradleRunner.create()
-        .withProjectDir(testProjectDir.root)
-        .withArguments("compileKotlin", "--info")
-        .withPluginClasspath()
-        .withGradleVersion(it)
-        .withDebug(true)
-        .build()
+    private fun simpleKotlinCompileBuild(it: String): BuildResult =
+        GradleRunner
+            .create()
+            .withProjectDir(testProjectDir.root)
+            .withArguments("compileKotlin", "--info")
+            .withPluginClasspath()
+            .withGradleVersion(it)
+            .withDebug(true)
+            .build()
 
     private fun assertTerminalOutput(build: BuildResult) {
         print(build.output)
@@ -182,36 +184,36 @@ class InfoKotlinProcessPluginTest {
     private fun createBuildGradle() {
         testProjectDir.newFile("build.gradle").appendText(
             """
-                    plugins {
-                        id 'org.jetbrains.kotlin.jvm' version '1.7.21'
-                        id 'application'
-                        id 'io.github.cdsap.kotlinprocess'
-                    }
-                    repositories {
-                        mavenCentral()
-                    }
+            plugins {
+                id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+                id 'application'
+                id 'io.github.cdsap.kotlinprocess'
+            }
+            repositories {
+                mavenCentral()
+            }
 
-                """.trimIndent()
+            """.trimIndent(),
         )
     }
 
     private fun createBuildGradle17() {
         testProjectDir.newFile("build.gradle").appendText(
             """
-                    plugins {
-                        id 'org.jetbrains.kotlin.jvm' version '1.7.21'
-                        id 'application'
-                        id 'io.github.cdsap.kotlinprocess'
-                    }
-                    repositories {
-                        mavenCentral()
-                    }
-                    java {
-                        toolchain {
-                            languageVersion = JavaLanguageVersion.of(17)
-                        }
-                    }
-                """.trimIndent()
+            plugins {
+                id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+                id 'application'
+                id 'io.github.cdsap.kotlinprocess'
+            }
+            repositories {
+                mavenCentral()
+            }
+            java {
+                toolchain {
+                    languageVersion = JavaLanguageVersion.of(17)
+                }
+            }
+            """.trimIndent(),
         )
     }
 
@@ -219,13 +221,13 @@ class InfoKotlinProcessPluginTest {
         testProjectDir.newFolder("src/main/kotlin/com/example")
         testProjectDir.newFile("src/main/kotlin/com/example/Hello.kt").appendText(
             """
-                    package com.example
-                    class Hello() {
-                      fun print() {
-                        println("hello")
-                      }
-                    }
-                    """.trimIndent()
+            package com.example
+            class Hello() {
+              fun print() {
+                println("hello")
+              }
+            }
+            """.trimIndent(),
         )
     }
 }

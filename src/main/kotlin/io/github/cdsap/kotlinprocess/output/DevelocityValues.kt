@@ -7,7 +7,6 @@ class DevelocityValues(
     private val develocityConfiguration: DevelocityConfiguration,
     private val processes: List<Process>,
 ) {
-
     fun addProcessesInfoToBuildScan() {
         processes.map {
             develocityConfiguration.buildScan {
