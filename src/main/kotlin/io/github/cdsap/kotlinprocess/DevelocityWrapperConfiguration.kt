@@ -13,10 +13,9 @@ import org.gradle.api.provider.Provider
 class DevelocityWrapperConfiguration {
 
     fun configureProjectWithDevelocity(target: Project) {
-        val extension = target.extensions.findByType(DevelocityWrapperConfiguration::class.java) != null
+        val extension = target.extensions.findByType(DevelocityConfiguration::class.java) != null
         if (extension) {
             buildScanDevelocityReporting(target, target.extensions.findByType(DevelocityConfiguration::class.java)!!)
-            target.extensions.create("develocity", DevelocityWrapperConfiguration::class.java)
         }
     }
 
