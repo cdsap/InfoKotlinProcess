@@ -24,7 +24,7 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
         testProjectDir.newFile("settings.gradle").appendText(
             """
                 plugins {
-                    id 'com.gradle.develocity' version '2.2.20'
+                    id 'com.gradle.develocity' version '4.2'
                 }
                 develocity {
                     server = "${System.getenv("GE_URL")}"
@@ -38,7 +38,7 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
         testProjectDir.newFile("build.gradle").appendText(
             """
                 plugins {
-                    id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+                    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
                     id 'application'
                     id 'io.github.cdsap.kotlinprocess'
                 }
