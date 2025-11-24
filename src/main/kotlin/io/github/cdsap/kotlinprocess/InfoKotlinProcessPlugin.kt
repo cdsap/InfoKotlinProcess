@@ -7,18 +7,17 @@ import org.gradle.api.Project
 import org.gradle.build.event.BuildEventsListenerRegistry
 import org.gradle.kotlin.dsl.support.serviceOf
 
-
 class InfoKotlinProcessPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.gradle.rootProject {
-
-            val hasDevelocity = try {
-                Class.forName("com.gradle.develocity.agent.gradle.DevelocityConfiguration")
-                true
-            } catch (_: ClassNotFoundException) {
-                false
-            }
-            if (hasDevelocity ) {
+            val hasDevelocity =
+                try {
+                    Class.forName("com.gradle.develocity.agent.gradle.DevelocityConfiguration")
+                    true
+                } catch (_: ClassNotFoundException) {
+                    false
+                }
+            if (hasDevelocity) {
                 DevelocityWrapperConfiguration().configureProjectWithDevelocity(target)
             } else {
                 consoleReporting(target)
@@ -27,12 +26,14 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
     }
 
     private fun consoleReporting(project: Project) {
-        val service = project.gradle.sharedServices.registerIfAbsent(
-            "kotlinProcessService", InfoKotlinProcessBuildService::class.java
-        ) {
-            parameters.jInfoProvider = project.jInfo(Constants.KOTLIN_PROCESS_NAME)
-            parameters.jStatProvider = project.jStat(Constants.KOTLIN_PROCESS_NAME)
-        }
+        val service =
+            project.gradle.sharedServices.registerIfAbsent(
+                "kotlinProcessService",
+                InfoKotlinProcessBuildService::class.java,
+            ) {
+                parameters.jInfoProvider = project.jInfo(Constants.KOTLIN_PROCESS_NAME)
+                parameters.jStatProvider = project.jStat(Constants.KOTLIN_PROCESS_NAME)
+            }
         project.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(service)
     }
 }

@@ -3,6 +3,7 @@ plugins {
     `maven-publish`
     `kotlin-dsl`
     id("com.gradle.plugin-publish") version "1.0.0-rc-1"
+    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 }
 
 group = "io.github.cdsap"
@@ -25,7 +26,7 @@ tasks.withType<Test>().configureEach {
     filter {
 
         if (project.hasProperty("excludeTests")) {
-            excludeTest(project.property("excludeTests").toString(),"")
+            excludeTest(project.property("excludeTests").toString(), "")
         }
     }
 }
@@ -87,7 +88,7 @@ publishing {
                 name.set("InfoKotlinProcess")
                 url.set("https://github.com/cdsap/InfoKotlinProcess/")
                 description.set(
-                    "Retrieve information of the Kotlin process in your Build Scan or console"
+                    "Retrieve information of the Kotlin process in your Build Scan or console",
                 )
                 licenses {
                     license {

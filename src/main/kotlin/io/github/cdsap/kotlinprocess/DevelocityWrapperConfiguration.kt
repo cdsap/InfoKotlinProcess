@@ -11,18 +11,16 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 
 class DevelocityWrapperConfiguration {
-
     fun configureProjectWithDevelocity(target: Project) {
-        val extension = target.extensions.findByType(DevelocityWrapperConfiguration::class.java) != null
+        val extension = target.extensions.findByType(DevelocityConfiguration::class.java) != null
         if (extension) {
             buildScanDevelocityReporting(target, target.extensions.findByType(DevelocityConfiguration::class.java)!!)
-            target.extensions.create("develocity", DevelocityWrapperConfiguration::class.java)
         }
     }
 
     private fun buildScanDevelocityReporting(
         project: Project,
-        buildScanExtension: DevelocityConfiguration
+        buildScanExtension: DevelocityConfiguration,
     ) {
         val (jStat, jInfo) = providerPair(project)
 
@@ -34,7 +32,7 @@ class DevelocityWrapperConfiguration {
 
     private fun processes(
         jStat: Provider<String>,
-        jInfo: Provider<String>
+        jInfo: Provider<String>,
     ): List<Process> {
         val processes = ConsolidateProcesses().consolidate(jStat.get(), jInfo.get(), TypeProcess.Kotlin)
         return processes

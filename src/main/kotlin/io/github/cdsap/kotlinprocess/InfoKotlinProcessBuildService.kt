@@ -10,7 +10,8 @@ import org.gradle.tooling.events.FinishEvent
 import org.gradle.tooling.events.OperationCompletionListener
 
 abstract class InfoKotlinProcessBuildService :
-    BuildService<InfoKotlinProcessBuildService.Params>, AutoCloseable,
+    BuildService<InfoKotlinProcessBuildService.Params>,
+    AutoCloseable,
     OperationCompletionListener {
     interface Params : BuildServiceParameters {
         var jInfoProvider: Provider<String>
@@ -22,7 +23,7 @@ abstract class InfoKotlinProcessBuildService :
             ConsolidateProcesses().consolidate(
                 parameters.jStatProvider.get(),
                 parameters.jInfoProvider.get(),
-                TypeProcess.Kotlin
+                TypeProcess.Kotlin,
             )
         if (processes.isNotEmpty()) {
             ConsoleOutput(processes).print()
