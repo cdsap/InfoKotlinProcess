@@ -40,7 +40,8 @@ jobs:
               uses: gradle/actions/setup-gradle@v5
             - uses: cdsap/build-process-watcher@v0.6.0
               with:
-                remote_monitoring: 'true'              
+                remote_monitoring: 'true'  
+                export_to_bigquery: 'true'               
             - name: Execute Gradle build
               run:  ./gradlew test -PexcludeTests=*.InfoKotlinProcessPluginTest
               env:
@@ -67,6 +68,7 @@ jobs:
               uses: gradle/actions/setup-gradle@v5
             - uses: cdsap/build-process-watcher@v0.6.0
               with:
-                remote_monitoring: 'true'              
+                remote_monitoring: 'true'          
+                export_to_bigquery: 'true'    
             - name: Execute Gradle build
               run:  ./gradlew test --tests io.github.cdsap.kotlinprocess.InfoKotlinProcessPluginTest
