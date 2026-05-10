@@ -42,7 +42,6 @@ jobs:
               with:
                 remote_monitoring: 'true'  
                 export_to_bigquery: 'true'
-                debug: 'true'               
             - name: Execute Gradle build
               run:  ./gradlew test -PexcludeTests=*.InfoKotlinProcessPluginTest
               env:
@@ -71,6 +70,5 @@ jobs:
               with:
                 remote_monitoring: 'true'          
                 export_to_bigquery: 'true'
-                debug: 'true'    
             - name: Execute Gradle build
               run:  ./gradlew test --tests io.github.cdsap.kotlinprocess.InfoKotlinProcessPluginTest
