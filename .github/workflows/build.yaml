@@ -15,7 +15,7 @@ jobs:
                     java-version: 17
 
             -   name: Setup Gradle
-                uses: gradle/actions/setup-gradle@v5
+                uses: gradle/actions/setup-gradle@v6
             -   name: Execute Gradle build
                 run: ./gradlew ktlintCheck
                 env:
@@ -37,7 +37,7 @@ jobs:
                   java-version:  ${{ matrix.version }}
 
             - name: Setup Gradle
-              uses: gradle/actions/setup-gradle@v5
+              uses: gradle/actions/setup-gradle@v6
             - uses: cdsap/build-process-watcher@v0.6.1
               with:
                 remote_monitoring: 'true'  
@@ -65,7 +65,7 @@ jobs:
                   java-version:  ${{ matrix.version }}
 
             - name: Setup Gradle
-              uses: gradle/actions/setup-gradle@v5
+              uses: gradle/actions/setup-gradle@v6
             - uses: cdsap/build-process-watcher@v0.6.1
               with:
                 remote_monitoring: 'true'          
