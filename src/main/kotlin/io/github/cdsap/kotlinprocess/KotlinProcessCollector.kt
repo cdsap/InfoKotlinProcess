@@ -9,5 +9,10 @@ class KotlinProcessCollector {
     fun collect(
         jStat: Provider<String>,
         jInfo: Provider<String>,
-    ): List<Process> = ConsolidateProcesses().consolidate(jStat.get(), jInfo.get(), TypeProcess.Kotlin)
+    ): List<Process> = collect(jStat.get(), jInfo.get())
+
+    fun collect(
+        jStat: String,
+        jInfo: String,
+    ): List<Process> = ConsolidateProcesses().consolidate(jStat, jInfo, TypeProcess.Kotlin)
 }
