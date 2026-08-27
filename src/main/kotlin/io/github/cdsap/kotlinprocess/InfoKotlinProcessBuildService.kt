@@ -1,7 +1,5 @@
 package io.github.cdsap.kotlinprocess
 
-import io.github.cdsap.jdk.tools.parser.ConsolidateProcesses
-import io.github.cdsap.jdk.tools.parser.model.TypeProcess
 import io.github.cdsap.kotlinprocess.output.ConsoleOutput
 import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
@@ -20,10 +18,9 @@ abstract class InfoKotlinProcessBuildService :
 
     override fun close() {
         val processes =
-            ConsolidateProcesses().consolidate(
-                parameters.jStatProvider.get(),
-                parameters.jInfoProvider.get(),
-                TypeProcess.Kotlin,
+            KotlinProcessCollector().collect(
+                parameters.jStatProvider,
+                parameters.jInfoProvider,
             )
         if (processes.isNotEmpty()) {
             ConsoleOutput(processes).print()
