@@ -18,6 +18,28 @@ class KotlinProcessCollectorTest {
     }
 
     @Test
+    fun collectReturnsEmptyListForEmptyRawStrings() {
+        val processes = KotlinProcessCollector().collect("", "")
+
+        assertTrue(processes.isEmpty())
+    }
+
+    @Test
+    fun collectFromProvidersMatchesRawStringResults() {
+        val project = ProjectBuilder.builder().build()
+        val jStatValue = ""
+        val jInfoValue = ""
+        val jStat = project.providers.provider { jStatValue }
+        val jInfo = project.providers.provider { jInfoValue }
+        val collector = KotlinProcessCollector()
+
+        assertEquals(
+            collector.collect(jStatValue, jInfoValue),
+            collector.collect(jStat, jInfo),
+        )
+    }
+
+    @Test
     fun collectQueriesProvidersLazily() {
         val project = ProjectBuilder.builder().build()
         var jStatGets = 0
