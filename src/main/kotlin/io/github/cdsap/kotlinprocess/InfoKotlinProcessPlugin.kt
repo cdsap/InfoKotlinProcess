@@ -1,7 +1,5 @@
 package io.github.cdsap.kotlinprocess
 
-import io.github.cdsap.valuesourceprocess.jInfo
-import io.github.cdsap.valuesourceprocess.jStat
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.build.event.BuildEventsListenerRegistry
@@ -31,8 +29,9 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
                 "kotlinProcessService",
                 InfoKotlinProcessBuildService::class.java,
             ) {
-                parameters.jInfoProvider = project.jInfo(Constants.KOTLIN_PROCESS_NAME)
-                parameters.jStatProvider = project.jStat(Constants.KOTLIN_PROCESS_NAME)
+                val (jStat, jInfo) = KotlinProcessCollector().providers(project)
+                parameters.jInfoProvider = jInfo
+                parameters.jStatProvider = jStat
             }
         project.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(service)
     }
