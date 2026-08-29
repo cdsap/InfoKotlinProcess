@@ -168,7 +168,6 @@ class InfoKotlinProcessPluginTest {
             .withArguments("compileKotlin", "--info")
             .withPluginClasspath()
             .withGradleVersion(it)
-            .withDebug(true)
             .build()
 
     private fun assertTerminalOutput(build: BuildResult) {

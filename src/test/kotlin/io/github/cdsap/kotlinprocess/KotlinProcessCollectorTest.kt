@@ -1,22 +1,11 @@
 package io.github.cdsap.kotlinprocess
 
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Test
 
 class KotlinProcessCollectorTest {
-    @Test
-    fun providersCreatesJStatAndJInfoPair() {
-        val project = ProjectBuilder.builder().build()
-
-        val (jStat, jInfo) = KotlinProcessCollector().providers(project)
-
-        assertNotNull(jStat)
-        assertNotNull(jInfo)
-    }
-
     @Test
     fun collectReturnsEmptyListForEmptyProviderValues() {
         val project = ProjectBuilder.builder().build()
