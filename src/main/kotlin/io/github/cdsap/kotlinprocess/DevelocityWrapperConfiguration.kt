@@ -22,7 +22,7 @@ class DevelocityWrapperConfiguration {
         val jInfo = project.jInfo(Constants.KOTLIN_PROCESS_NAME)
 
         buildScanExtension.buildScan.buildFinished {
-            val processes = KotlinProcessCollector().collect(jStat, jInfo)
+            val processes = KotlinProcessCollector().collect(jStat.get(), jInfo.get())
             DevelocityValues(buildScanExtension, processes).addProcessesInfoToBuildScan()
         }
     }
