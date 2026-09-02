@@ -47,11 +47,17 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
             """.trimIndent(),
         )
         listOf("8.14.2", "9.2.1").forEach {
+            val configurationCacheArgs =
+                listOf(
+                    "compileKotlin",
+                    "--configuration-cache",
+                    "--configuration-cache-problems=fail",
+                )
             val firstBuild =
                 GradleRunner
                     .create()
                     .withProjectDir(testProjectDir.root)
-                    .withArguments("compileKotlin", "--configuration-cache")
+                    .withArguments(configurationCacheArgs)
                     .withPluginClasspath()
                     .withGradleVersion(it)
                     .build()
@@ -59,12 +65,18 @@ class InfoKotlinProcessPluginWtihBuildScanTest {
                 GradleRunner
                     .create()
                     .withProjectDir(testProjectDir.root)
-                    .withArguments("compileKotlin", "--configuration-cache")
+                    .withArguments(configurationCacheArgs)
                     .withPluginClasspath()
                     .withGradleVersion(it)
                     .build()
-            assertTrue(firstBuild.output.contains("Configuration cache entry stored"))
-            assertTrue(secondBuild.output.contains("Configuration cache entry reused."))
+            assertTrue(
+                "Expected configuration cache store on first run for Gradle $it, got:\n${firstBuild.output}",
+                firstBuild.output.contains("Configuration cache entry stored"),
+            )
+            assertTrue(
+                "Expected configuration cache HIT on second run for Gradle $it, got:\n${secondBuild.output}",
+                secondBuild.output.contains("Configuration cache entry reused."),
+            )
         }
     }
 
