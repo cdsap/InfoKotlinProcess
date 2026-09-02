@@ -28,14 +28,37 @@ class InfoKotlinProcessPluginTest {
 
     @Test
     fun testPluginIsCompatibleWithConfigurationCacheWithoutGradleEnterprise() {
-        createBuildGradle()
+        // Pair a Configuration Cache-capable Kotlin Gradle Plugin with --configuration-cache-problems=fail
+        // so store + HIT prove this plugin is CC-safe (Kotlin 1.7.x's KotlinCompile is not).
+        testProjectDir.newFile("build.gradle").appendText(
+            """
+            plugins {
+                id 'org.jetbrains.kotlin.jvm' version '2.0.20'
+                id 'application'
+                id 'io.github.cdsap.kotlinprocess'
+            }
+            repositories {
+                mavenCentral()
+            }
 
-        gradleVersions.forEach {
+            """.trimIndent(),
+        )
+        createKotlinClass()
+
+        val configurationCacheArgs =
+            listOf(
+                "compileKotlin",
+                "--no-build-cache",
+                "--configuration-cache",
+                "--configuration-cache-problems=fail",
+            )
+
+        listOf("8.12.1", "8.14.1").forEach {
             val firstBuild =
                 GradleRunner
                     .create()
                     .withProjectDir(testProjectDir.root)
-                    .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
+                    .withArguments(configurationCacheArgs)
                     .withPluginClasspath()
                     .withGradleVersion(it)
                     .build()
@@ -43,14 +66,18 @@ class InfoKotlinProcessPluginTest {
                 GradleRunner
                     .create()
                     .withProjectDir(testProjectDir.root)
-                    .withArguments("clean", "compileKotlin", "--no-build-cache", "--configuration-cache")
+                    .withArguments(configurationCacheArgs)
                     .withPluginClasspath()
                     .withGradleVersion(it)
                     .build()
-            assertTrue(firstBuild.output.contains("Configuration cache entry stored"))
-            assertTrue(firstBuild.output.contains("Kotlin processes"))
-            assertTrue(secondBuild.output.contains("Configuration cache entry reused."))
-            assertTrue(secondBuild.output.contains("Kotlin processes"))
+            assertTrue(
+                "Expected configuration cache store on first run for Gradle $it, got:\n${firstBuild.output}",
+                firstBuild.output.contains("Configuration cache entry stored"),
+            )
+            assertTrue(
+                "Expected configuration cache HIT on second run for Gradle $it, got:\n${secondBuild.output}",
+                secondBuild.output.contains("Configuration cache entry reused."),
+            )
         }
     }
 

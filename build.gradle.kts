@@ -1,8 +1,10 @@
+import org.gradle.plugin.compatibility.compatibility
+
 plugins {
     `java-gradle-plugin`
     `maven-publish`
     `kotlin-dsl`
-    id("com.gradle.plugin-publish") version "1.0.0-rc-1"
+    id("com.gradle.plugin-publish") version "2.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
@@ -31,20 +33,22 @@ tasks.withType<Test>().configureEach {
     }
 }
 gradlePlugin {
+    website.set("https://github.com/cdsap/InfoKotlinProcess")
+    vcsUrl.set("https://github.com/cdsap/InfoKotlinProcess")
     plugins {
         create("InfoKotlinProcessPlugin") {
             id = "io.github.cdsap.kotlinprocess"
             displayName = "Info Kotlin Processes"
             description = "Retrieve information of the Kotlin processes after the build execution"
             implementationClass = "io.github.cdsap.kotlinprocess.InfoKotlinProcessPlugin"
+            tags.set(listOf("kotlin", "process"))
+            compatibility {
+                features {
+                    configurationCache = true
+                }
+            }
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/cdsap/InfoKotlinProcess"
-    vcsUrl = "https://github.com/cdsap/InfoKotlinProcess"
-    tags = listOf("kotlin", "process")
 }
 
 publishing {

@@ -20,7 +20,7 @@ class InfoKotlinProcessNoDVTest {
         testProjectDir.newFile("build.gradle").appendText(
             """
             plugins {
-                id 'org.jetbrains.kotlin.jvm' version '1.7.21'
+                id 'org.jetbrains.kotlin.jvm' version '2.0.20'
                 id 'application'
                 id 'io.github.cdsap.kotlinprocess'
             }
@@ -30,12 +30,29 @@ class InfoKotlinProcessNoDVTest {
 
             """.trimIndent(),
         )
+        testProjectDir.newFolder("src/main/kotlin/com/example")
+        testProjectDir.newFile("src/main/kotlin/com/example/Hello.kt").appendText(
+            """
+            package com.example
+            class Hello() {
+              fun print() {
+                println("hello")
+              }
+            }
+            """.trimIndent(),
+        )
         listOf("8.14.2").forEach {
+            val configurationCacheArgs =
+                listOf(
+                    "compileKotlin",
+                    "--configuration-cache",
+                    "--configuration-cache-problems=fail",
+                )
             val firstBuild =
                 GradleRunner
                     .create()
                     .withProjectDir(testProjectDir.root)
-                    .withArguments("compileKotlin", "--configuration-cache")
+                    .withArguments(configurationCacheArgs)
                     .withPluginClasspath()
                     .withGradleVersion(it)
                     .build()
@@ -43,12 +60,18 @@ class InfoKotlinProcessNoDVTest {
                 GradleRunner
                     .create()
                     .withProjectDir(testProjectDir.root)
-                    .withArguments("compileKotlin", "--configuration-cache")
+                    .withArguments(configurationCacheArgs)
                     .withPluginClasspath()
                     .withGradleVersion(it)
                     .build()
-            TestCase.assertTrue(firstBuild.output.contains("Configuration cache entry stored"))
-            TestCase.assertTrue(secondBuild.output.contains("Configuration cache entry reused."))
+            TestCase.assertTrue(
+                "Expected configuration cache store on first run for Gradle $it, got:\n${firstBuild.output}",
+                firstBuild.output.contains("Configuration cache entry stored"),
+            )
+            TestCase.assertTrue(
+                "Expected configuration cache HIT on second run for Gradle $it, got:\n${secondBuild.output}",
+                secondBuild.output.contains("Configuration cache entry reused."),
+            )
         }
     }
 
