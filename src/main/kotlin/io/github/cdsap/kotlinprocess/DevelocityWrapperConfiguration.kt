@@ -2,8 +2,6 @@ package io.github.cdsap.kotlinprocess
 
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import io.github.cdsap.kotlinprocess.output.DevelocityValues
-import io.github.cdsap.valuesourceprocess.jInfo
-import io.github.cdsap.valuesourceprocess.jStat
 import org.gradle.api.Project
 
 class DevelocityWrapperConfiguration {
@@ -18,11 +16,10 @@ class DevelocityWrapperConfiguration {
         project: Project,
         buildScanExtension: DevelocityConfiguration,
     ) {
-        val jStat = project.jStat(Constants.KOTLIN_PROCESS_NAME)
-        val jInfo = project.jInfo(Constants.KOTLIN_PROCESS_NAME)
+        val providers = project.kotlinProcessProviders()
 
         buildScanExtension.buildScan.buildFinished {
-            val processes = KotlinProcessCollector().collect(jStat.get(), jInfo.get())
+            val processes = consolidateKotlinProcesses(providers.jStat.get(), providers.jInfo.get())
             DevelocityValues(buildScanExtension, processes).addProcessesInfoToBuildScan()
         }
     }

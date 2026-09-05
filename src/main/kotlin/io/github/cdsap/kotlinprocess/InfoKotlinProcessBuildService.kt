@@ -18,7 +18,7 @@ abstract class InfoKotlinProcessBuildService :
 
     override fun close() {
         val processes =
-            KotlinProcessCollector().collect(
+            consolidateKotlinProcesses(
                 parameters.jStatProvider.get(),
                 parameters.jInfoProvider.get(),
             )
