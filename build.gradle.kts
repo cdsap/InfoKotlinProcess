@@ -4,7 +4,7 @@ plugins {
     `java-gradle-plugin`
     `maven-publish`
     `kotlin-dsl`
-    id("com.gradle.plugin-publish") version "2.2.0"
+    id("com.gradle.plugin-publish") version "2.2.1"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
