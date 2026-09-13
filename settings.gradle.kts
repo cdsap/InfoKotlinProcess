@@ -1,16 +1,16 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        google()
-        mavenCentral()
     }
 }
 
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        gradlePluginPortal()
-        google()
+        exclusiveContent {
+            forRepository { gradlePluginPortal() }
+            filter { includeGroupByRegex("com\\.gradle.*") }
+        }
         mavenCentral()
     }
 }
