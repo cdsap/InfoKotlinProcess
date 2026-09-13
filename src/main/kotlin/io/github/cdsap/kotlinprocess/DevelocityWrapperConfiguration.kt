@@ -5,11 +5,16 @@ import io.github.cdsap.kotlinprocess.output.DevelocityValues
 import org.gradle.api.Project
 
 class DevelocityWrapperConfiguration {
+    /** @return true when Build Scan reporting was registered from the Develocity extension. */
+    fun configureProjectWithDevelocityIfPresent(target: Project): Boolean {
+        val develocity = target.extensions.findByType(DevelocityConfiguration::class.java) ?: return false
+        buildScanDevelocityReporting(target, develocity)
+        return true
+    }
+
     fun configureProjectWithDevelocity(target: Project) {
-        val extension = target.extensions.findByType(DevelocityConfiguration::class.java) != null
-        if (extension) {
-            buildScanDevelocityReporting(target, target.extensions.findByType(DevelocityConfiguration::class.java)!!)
-        }
+        val develocity = target.extensions.getByType(DevelocityConfiguration::class.java)
+        buildScanDevelocityReporting(target, develocity)
     }
 
     private fun buildScanDevelocityReporting(
