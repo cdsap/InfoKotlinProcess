@@ -1,0 +1,17 @@
+[versions]
+jdkToolsParser = "0.1.1"
+commandlineValueSource = "0.1.0"
+picnic = "0.7.0"
+develocity = "4.5.1"
+junit = "4.13.2"
+
+[libraries]
+cdsap-jdkToolsParser = { module = "io.github.cdsap:jdk-tools-parser", version.ref = "jdkToolsParser" }
+cdsap-commandlineValueSource = { module = "io.github.cdsap:commandline-value-source", version.ref = "commandlineValueSource" }
+picnic = { module = "com.jakewharton.picnic:picnic", version.ref = "picnic" }
+develocity-gradlePlugin = { module = "com.gradle:develocity-gradle-plugin", version.ref = "develocity" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+pluginPublish = { id = "com.gradle.plugin-publish", version = "2.2.1" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "14.2.0" }
