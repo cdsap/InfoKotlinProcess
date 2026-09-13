@@ -8,16 +8,28 @@ import org.gradle.kotlin.dsl.support.serviceOf
 class InfoKotlinProcessPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.gradle.rootProject {
-            val hasDevelocity =
+            // Prefer the Develocity extension when present (settings-applied Develocity
+            // installs it on the root project but does not set project.hasPlugin).
+            // Never gate console output on Class.forName — a transitive jar without an
+            // applied plugin must not produce a silent no-op.
+            val scanConfigured =
                 try {
-                    Class.forName("com.gradle.develocity.agent.gradle.DevelocityConfiguration")
-                    true
-                } catch (_: ClassNotFoundException) {
+                    DevelocityWrapperConfiguration().configureProjectWithDevelocityIfPresent(target)
+                } catch (_: NoClassDefFoundError) {
+                    false
+                } catch (_: ExceptionInInitializerError) {
                     false
                 }
-            if (hasDevelocity) {
+
+            if (scanConfigured) {
+                return@rootProject
+            }
+
+            target.pluginManager.withPlugin("com.gradle.develocity") {
                 DevelocityWrapperConfiguration().configureProjectWithDevelocity(target)
-            } else {
+            }
+
+            if (!target.pluginManager.hasPlugin("com.gradle.develocity")) {
                 consoleReporting(target)
             }
         }

@@ -17,14 +17,29 @@ java {
     }
 }
 
+val develocityProbeClasspath =
+    configurations.create("develocityProbeClasspath") {
+        isCanBeConsumed = false
+        isCanBeResolved = true
+    }
+
 dependencies {
     implementation(libs.cdsap.jdkToolsParser)
     implementation(libs.cdsap.commandlineValueSource)
     implementation(libs.picnic)
     compileOnly(libs.develocity.gradlePlugin)
     testImplementation(libs.junit)
+    // Detached configuration for the classpath-probe TestKit regression only.
+    // Keep it off testRuntimeClasspath so the jar does not leak into other TestKit runs.
+    develocityProbeClasspath(libs.develocity.gradlePlugin)
 }
+
 tasks.withType<Test>().configureEach {
+    inputs.files(develocityProbeClasspath)
+    systemProperty(
+        "develocity.probe.classpath.jar",
+        develocityProbeClasspath.singleFile.absolutePath,
+    )
     filter {
 
         if (project.hasProperty("excludeTests")) {
