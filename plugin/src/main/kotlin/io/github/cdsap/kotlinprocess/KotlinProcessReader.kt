@@ -4,8 +4,8 @@ import io.github.cdsap.jdk.tools.parser.ConsolidateProcesses
 import io.github.cdsap.jdk.tools.parser.model.Process
 import io.github.cdsap.jdk.tools.parser.model.TypeProcess
 
-class KotlinProcessCollector {
-    fun collect(
+class KotlinProcessReader {
+    fun read(
         jStat: String,
         jInfo: String,
     ): List<Process> = ConsolidateProcesses().consolidate(jStat, jInfo, TypeProcess.Kotlin)
