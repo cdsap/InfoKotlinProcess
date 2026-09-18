@@ -8,7 +8,7 @@ import java.util.Properties
 class GradlePropertiesEncodingTest {
     @Test
     fun gradlePropertiesPinsUtf8FileEncoding() {
-        val gradlePropertiesFile = File("gradle.properties")
+        val gradlePropertiesFile = locateRootGradleProperties()
         assertTrue(
             "Expected gradle.properties at project root to pin file encoding",
             gradlePropertiesFile.exists(),
@@ -23,5 +23,18 @@ class GradlePropertiesEncodingTest {
             "Expected org.gradle.jvmargs to include -Dfile.encoding=UTF-8, got: $jvmArgs",
             jvmArgs.split(Regex("\\s+")).contains("-Dfile.encoding=UTF-8"),
         )
+    }
+
+    private fun locateRootGradleProperties(): File {
+        var directory = File(System.getProperty("user.dir")).canonicalFile
+        while (true) {
+            val candidate = File(directory, "gradle.properties")
+            if (candidate.isFile) {
+                return candidate
+            }
+            val parent = directory.parentFile ?: break
+            directory = parent
+        }
+        return File("gradle.properties")
     }
 }

@@ -40,9 +40,9 @@ class VersionCatalogTest {
             )
         }
 
-        val buildScript = locateProjectFile("build.gradle.kts")
+        val buildScript = locateProjectFile("plugin/build.gradle.kts")
         assertTrue(
-            "Expected build.gradle.kts at ${buildScript.absolutePath}",
+            "Expected plugin/build.gradle.kts at ${buildScript.absolutePath}",
             buildScript.isFile,
         )
 
@@ -57,7 +57,7 @@ class VersionCatalogTest {
             "testImplementation(libs.junit)",
         ).forEach { expected ->
             assertTrue(
-                "build.gradle.kts must consume the version catalog via $expected",
+                "plugin/build.gradle.kts must consume the version catalog via $expected",
                 buildText.contains(expected),
             )
         }
@@ -72,7 +72,7 @@ class VersionCatalogTest {
             "junit:junit:",
         ).forEach { forbidden ->
             assertFalse(
-                "build.gradle.kts must not hardcode dependency/plugin coordinates: $forbidden",
+                "plugin/build.gradle.kts must not hardcode dependency/plugin coordinates: $forbidden",
                 buildText.contains(forbidden),
             )
         }
