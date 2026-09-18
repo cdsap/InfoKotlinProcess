@@ -5,33 +5,33 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
 
-class KotlinProcessReaderTest {
-    private val reader = KotlinProcessReader()
+class KotlinProcessCollectorTest {
+    private val collector = KotlinProcessCollector()
 
     @Test
-    fun readReturnsEmptyListForEmptyRawStrings() {
-        val processes = reader.read("", "")
+    fun collectReturnsEmptyListForEmptyRawStrings() {
+        val processes = collector.collect("", "")
 
         assertTrue(processes.isEmpty())
     }
 
     @Test
-    fun readReturnsEmptyListForBlankRawStrings() {
-        val processes = reader.read("   ", "\n")
+    fun collectReturnsEmptyListForBlankRawStrings() {
+        val processes = collector.collect("   ", "\n")
 
         assertTrue(processes.isEmpty())
     }
 
     @Test
-    fun readReturnsEmptyListWhenRawProcessInfoHasNoMatchingProcesses() {
-        val processes = reader.read("xxxx", "yyyy")
+    fun collectReturnsEmptyListWhenRawProcessInfoHasNoMatchingProcesses() {
+        val processes = collector.collect("xxxx", "yyyy")
 
         assertTrue(processes.isEmpty())
     }
 
     @Test
-    fun readConsolidatesRawProcessInfoAsKotlinTypeProcess() {
-        val processes = reader.read(jStatWithPid, jInfoWithPid)
+    fun collectConsolidatesRawProcessInfoAsKotlinTypeProcess() {
+        val processes = collector.collect(jStatWithPid, jInfoWithPid)
 
         assertEquals(1, processes.size)
         assertEquals("28743", processes[0].pid)

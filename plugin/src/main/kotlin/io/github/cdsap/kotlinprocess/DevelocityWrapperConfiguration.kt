@@ -25,7 +25,7 @@ class DevelocityWrapperConfiguration {
 
         buildScanExtension.buildScan.buildFinished {
             val processes =
-                KotlinProcessReader().read(
+                KotlinProcessCollector().collect(
                     providers.jStat.get(),
                     providers.jInfo.get(),
                 )
