@@ -31,6 +31,8 @@ dependencies {
     implementation(libs.picnic)
     compileOnly(libs.develocity.gradlePlugin)
     testImplementation(libs.junit)
+    testImplementation(libs.build.observability.schema)
+    testImplementation(libs.json.schema.validator)
     develocityProbeClasspath(libs.develocity.gradlePlugin)
 }
 

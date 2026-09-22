@@ -7,6 +7,15 @@ import org.gradle.kotlin.dsl.support.serviceOf
 
 class InfoKotlinProcessPlugin : Plugin<Project> {
     override fun apply(target: Project) {
+        val rootProject = target.rootProject
+        val extension =
+            rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
+                ?: rootProject.extensions.create(
+                    "infoKotlinProcess",
+                    InfoKotlinProcessExtension::class.java,
+                )
+        GbosOptIn.configureConventions(extension.gbos, rootProject.providers)
+
         target.gradle.rootProject {
             // Prefer the Develocity extension when present (settings-applied Develocity
             // installs it on the root project but does not set project.hasPlugin).
@@ -14,7 +23,8 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
             // applied plugin must not produce a silent no-op.
             val scanConfigured =
                 try {
-                    DevelocityWrapperConfiguration().configureProjectWithDevelocityIfPresent(target)
+                    DevelocityWrapperConfiguration()
+                        .configureProjectWithDevelocityIfPresent(target, extension.gbos.develocity)
                 } catch (_: NoClassDefFoundError) {
                     false
                 } catch (_: ExceptionInInitializerError) {
@@ -26,7 +36,8 @@ class InfoKotlinProcessPlugin : Plugin<Project> {
             }
 
             target.pluginManager.withPlugin("com.gradle.develocity") {
-                DevelocityWrapperConfiguration().configureProjectWithDevelocity(target)
+                DevelocityWrapperConfiguration()
+                    .configureProjectWithDevelocity(target, extension.gbos.develocity)
             }
 
             if (!target.pluginManager.hasPlugin("com.gradle.develocity")) {

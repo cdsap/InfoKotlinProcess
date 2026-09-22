@@ -58,6 +58,28 @@ Build Scan:
 
 The field `Usage` represents the value obtained at the end of the build using `jstat` on the JVM process.
 
+#### GBOS observations
+
+Build Scan GBOS output is opt-in. Enable it with a Gradle property:
+
+```properties
+infoKotlinProcess.gbos.develocity.enabled=true
+```
+
+or configure it in the root build script:
+
+```kotlin
+infoKotlinProcess {
+    gbos {
+        develocity.set(true)
+    }
+}
+```
+
+When enabled, GBOS observations replace the plugin's legacy `Kotlin-Process-*` Build Scan custom values;
+the plugin does not publish both formats in one scan. Without opt-in, the existing custom values and
+console output are unchanged. Each Kotlin daemon is reported as a `jvm.process` entity observation.
+
 ### Build Output
 If you are not using Develocity, the information about the Kotlin processes will be included at the end of the build:
 ```

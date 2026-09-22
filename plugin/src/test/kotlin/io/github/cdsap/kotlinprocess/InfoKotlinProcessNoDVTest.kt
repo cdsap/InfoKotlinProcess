@@ -12,6 +12,48 @@ class InfoKotlinProcessNoDVTest {
     val testProjectDir = TemporaryFolder()
 
     @Test
+    fun gbosDevelocityOptInDefaultsOffAndCanBeEnabledInDsl() {
+        testProjectDir.newFile("settings.gradle").writeText("")
+        testProjectDir.newFile("build.gradle").writeText(
+            """
+            plugins {
+                id 'io.github.cdsap.kotlinprocess'
+            }
+
+            if (infoKotlinProcess.gbos.develocity.get()) {
+                throw new GradleException('GBOS Develocity reporting should default to off')
+            }
+
+            infoKotlinProcess {
+                gbos {
+                    develocity.set(true)
+                }
+            }
+
+            tasks.register('assertGbosOptIn') {
+                inputs.property('gbosEnabled', infoKotlinProcess.gbos.develocity)
+                doLast {
+                    if (inputs.properties['gbosEnabled'] != true) {
+                        throw new GradleException('GBOS Develocity opt-in was not applied')
+                    }
+                }
+            }
+            """.trimIndent(),
+        )
+
+        val build =
+            GradleRunner
+                .create()
+                .withProjectDir(testProjectDir.root)
+                .withArguments("assertGbosOptIn", "--configuration-cache", "--configuration-cache-problems=fail")
+                .withPluginClasspath()
+                .withGradleVersion("8.14.2")
+                .build()
+
+        TestCase.assertTrue(build.output.contains("BUILD SUCCESSFUL"))
+    }
+
+    @Test
     fun testPluginIsCompatibleWithConfigurationCacheWithDevelocity() {
         testProjectDir.newFile("settings.gradle").appendText(
             """
