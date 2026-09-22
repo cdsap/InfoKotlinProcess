@@ -1,11 +1,11 @@
 package io.github.cdsap.kotlinprocess.output
 
 import groovy.json.JsonOutput
-import io.github.cdsap.jdk.tools.parser.model.Process
 import io.github.cdsap.gbos.core.GbosAttributeValue
 import io.github.cdsap.gbos.core.GbosMeasurement
 import io.github.cdsap.gbos.core.GbosObservation
 import io.github.cdsap.gbos.core.GbosProducer
+import io.github.cdsap.jdk.tools.parser.model.Process
 import kotlin.math.roundToLong
 
 internal object DevelocityCustomValues {
@@ -51,50 +51,55 @@ internal object GbosDevelocityProjection {
     }
 
     private fun observation(process: Process): String {
-        val attributes = buildMap<String, GbosAttributeValue> {
-            put(
-                "process.pid",
-                GbosAttributeValue.Integer(
-                    requireNotNull(process.pid.toLongOrNull()) {
-                        "Kotlin process PID must be numeric: ${process.pid}"
-                    },
-                ),
+        val attributes =
+            buildMap<String, GbosAttributeValue> {
+                put(
+                    "process.pid",
+                    GbosAttributeValue.Integer(
+                        requireNotNull(process.pid.toLongOrNull()) {
+                            "Kotlin process PID must be numeric: ${process.pid}"
+                        },
+                    ),
+                )
+                put("jvm.process.role", GbosAttributeValue.Text("kotlin-daemon"))
+                normalizeGcName(process.typeGc)?.let { put("jvm.gc.name", GbosAttributeValue.Text(it)) }
+            }
+        val observation =
+            GbosObservation(
+                schemaVersion = SCHEMA_VERSION,
+                producer = GbosProducer(PRODUCER_NAME, CONTRACT_VERSION),
+                scope = "jvm.process",
+                aggregationScope = "entity",
+                attributes = attributes,
+                measurements =
+                    listOf(
+                        GbosMeasurement("jvm.process.memory.heap.limit", process.max.toBytes().toDouble(), "By", "last"),
+                        GbosMeasurement("jvm.process.memory.heap.used", process.usage.toBytes().toDouble(), "By", "last"),
+                        GbosMeasurement("jvm.process.memory.heap.committed", process.capacity.toBytes().toDouble(), "By", "last"),
+                        GbosMeasurement("jvm.process.gc.time", process.gcTime * SECONDS_PER_MINUTE, "s", "sum"),
+                        GbosMeasurement("jvm.process.uptime", process.uptime * SECONDS_PER_MINUTE, "s", "last"),
+                    ),
             )
-            put("jvm.process.role", GbosAttributeValue.Text("kotlin-daemon"))
-            normalizeGcName(process.typeGc)?.let { put("jvm.gc.name", GbosAttributeValue.Text(it)) }
-        }
-        val observation = GbosObservation(
-            schemaVersion = SCHEMA_VERSION,
-            producer = GbosProducer(PRODUCER_NAME, CONTRACT_VERSION),
-            scope = "jvm.process",
-            aggregationScope = "entity",
-            attributes = attributes,
-            measurements = listOf(
-                GbosMeasurement("jvm.process.memory.heap.limit", process.max.toBytes().toDouble(), "By", "last"),
-                GbosMeasurement("jvm.process.memory.heap.used", process.usage.toBytes().toDouble(), "By", "last"),
-                GbosMeasurement("jvm.process.memory.heap.committed", process.capacity.toBytes().toDouble(), "By", "last"),
-                GbosMeasurement("jvm.process.gc.time", process.gcTime * SECONDS_PER_MINUTE, "s", "sum"),
-                GbosMeasurement("jvm.process.uptime", process.uptime * SECONDS_PER_MINUTE, "s", "last"),
-            ),
-        )
         return JsonOutput.toJson(
             linkedMapOf(
                 "scope" to observation.scope,
                 "aggregationScope" to observation.aggregationScope,
-                "attributes" to observation.attributes.mapValues { (_, value) ->
-                    when (value) {
-                        is GbosAttributeValue.Text -> value.value
-                        is GbosAttributeValue.Integer -> value.value
-                    }
-                },
-                "measurements" to observation.measurements.map { measurement ->
-                    linkedMapOf(
-                        "name" to measurement.name,
-                        "value" to if (measurement.unit == "By") measurement.value.toLong() else measurement.value,
-                        "unit" to measurement.unit,
-                        "aggregation" to measurement.aggregation,
-                    )
-                },
+                "attributes" to
+                    observation.attributes.mapValues { (_, value) ->
+                        when (value) {
+                            is GbosAttributeValue.Text -> value.value
+                            is GbosAttributeValue.Integer -> value.value
+                        }
+                    },
+                "measurements" to
+                    observation.measurements.map { measurement ->
+                        linkedMapOf(
+                            "name" to measurement.name,
+                            "value" to if (measurement.unit == "By") measurement.value.toLong() else measurement.value,
+                            "unit" to measurement.unit,
+                            "aggregation" to measurement.aggregation,
+                        )
+                    },
             ),
         )
     }
