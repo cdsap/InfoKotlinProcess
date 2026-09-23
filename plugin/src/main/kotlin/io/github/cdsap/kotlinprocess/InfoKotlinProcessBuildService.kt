@@ -18,9 +18,9 @@ abstract class InfoKotlinProcessBuildService :
 
     override fun close() {
         val processes =
-            KotlinProcessCollector().collect(
-                parameters.jStatProvider.get(),
-                parameters.jInfoProvider.get(),
+            collectKotlinProcesses(
+                parameters.jStatProvider,
+                parameters.jInfoProvider,
             )
         if (processes.isNotEmpty()) {
             ConsoleOutput(processes).print()
