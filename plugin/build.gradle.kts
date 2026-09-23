@@ -30,6 +30,7 @@ dependencies {
     implementation(libs.cdsap.commandlineValueSource)
     implementation(libs.picnic)
     compileOnly(libs.develocity.gradlePlugin)
+    implementation(libs.build.observability.core)
     testImplementation(libs.junit)
     testImplementation(libs.build.observability.schema)
     testImplementation(libs.json.schema.validator)

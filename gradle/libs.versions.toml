@@ -5,6 +5,7 @@ picnic = "0.7.0"
 develocity = "4.5.1"
 junit = "4.13.2"
 buildObservabilitySchema = "0.0.4"
+buildObservabilityCore = "0.0.6"
 jsonSchemaValidator = "3.0.7"
 
 [libraries]
@@ -14,6 +15,7 @@ picnic = { module = "com.jakewharton.picnic:picnic", version.ref = "picnic" }
 develocity-gradlePlugin = { module = "com.gradle:develocity-gradle-plugin", version.ref = "develocity" }
 junit = { module = "junit:junit", version.ref = "junit" }
 build-observability-schema = { module = "io.github.cdsap:build-observability-schema", version.ref = "buildObservabilitySchema" }
+build-observability-core = { module = "io.github.cdsap:build-observability-core", version.ref = "buildObservabilityCore" }
 json-schema-validator = { module = "com.networknt:json-schema-validator", version.ref = "jsonSchemaValidator" }
 
 [plugins]
