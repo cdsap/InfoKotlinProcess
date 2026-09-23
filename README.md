@@ -3,18 +3,36 @@ Includes information about Kotlin processes in the Build Scans or in the build o
 The plugin is compatible with configuration cache.
 
 ## Usage
-Apply the plugin in the main `build.gradle(.kts)` configuration file:
+Apply the plugin in `settings.gradle(.kts)` so it observes the whole build, including all projects:
 
-#### Kotlin
+#### Kotlin (`settings.gradle.kts`)
 Using the plugins DSL:
-``` groovy
+```kotlin
+plugins {
+  id("io.github.cdsap.kotlinprocess") version "0.3.0"
+}
+```
+
+#### Groovy (`settings.gradle`)
+Using the plugins DSL:
+```groovy
+plugins {
+  id "io.github.cdsap.kotlinprocess" version "0.3.0"
+}
+```
+
+The legacy project-plugin application in `build.gradle(.kts)` remains supported for
+published consumers, but settings-plugin application is preferred for multi-project builds.
+
+#### Legacy project application (`build.gradle.kts`)
+```kotlin
 plugins {
   id("io.github.cdsap.kotlinprocess") version "0.3.0"
 }
 ```
 
 Using legacy plugin application:
-``` groovy
+```kotlin
 buildscript {
   repositories {
     gradlePluginPortal()
@@ -27,17 +45,15 @@ buildscript {
 apply(plugin = "io.github.cdsap.kotlinprocess")
 ```
 
-#### Groovy
-Using the plugins DSL:
-``` groovy
+#### Legacy project application (`build.gradle`)
+```groovy
 plugins {
   id "io.github.cdsap.kotlinprocess" version "0.3.0"
 }
-
 ```
 
 Using legacy plugin application:
-``` groovy
+```groovy
 buildscript {
   repositories {
     gradlePluginPortal()
@@ -49,6 +65,7 @@ buildscript {
 
 apply plugin: "io.github.cdsap.kotlinprocess"
 ```
+
 ## Output
 ### Build Scans
 If you are using Develocity, the information about the Kotlin processes will be included as custom value in the
@@ -66,7 +83,7 @@ Build Scan GBOS output is opt-in. Enable it with a Gradle property:
 infoKotlinProcess.gbos.develocity.enabled=true
 ```
 
-or configure it in the root build script:
+or configure it in the settings script:
 
 ```kotlin
 infoKotlinProcess {

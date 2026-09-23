@@ -58,7 +58,8 @@ gradlePlugin {
         create("InfoKotlinProcessPlugin") {
             id = "io.github.cdsap.kotlinprocess"
             displayName = "Info Kotlin Processes"
-            description = "Retrieve information of the Kotlin processes after the build execution"
+            description =
+                "Retrieve information of Kotlin processes after the build execution from a settings or project plugin"
             implementationClass = "io.github.cdsap.kotlinprocess.InfoKotlinProcessPlugin"
             tags.set(listOf("kotlin", "process"))
             compatibility {
