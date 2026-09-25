@@ -2,7 +2,7 @@
 jdkToolsParser = "0.1.1"
 commandlineValueSource = "0.1.0"
 picnic = "0.7.0"
-develocity = "4.5.1"
+develocity = "4.6.0"
 junit = "4.13.2"
 buildObservabilitySchema = "0.0.4"
 buildObservabilityCore = "0.0.6"
