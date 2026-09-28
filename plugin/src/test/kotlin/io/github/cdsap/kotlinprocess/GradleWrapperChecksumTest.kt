@@ -22,7 +22,7 @@ class GradleWrapperChecksumTest {
 
         val distributionUrl = properties.getProperty("distributionUrl")
         assertEquals(
-            "https://services.gradle.org/distributions/gradle-9.7.1-bin.zip",
+            "https://services.gradle.org/distributions/gradle-9.8.0-bin.zip",
             distributionUrl?.replace("\\:", ":"),
         )
 
@@ -37,7 +37,7 @@ class GradleWrapperChecksumTest {
         )
         assertEquals(
             // Binary-only (-bin) ZIP checksum from https://gradle.org/release-checksums/
-            "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+            "bafd5ce9cfaea0fbccfdc8439a1ac42fbd4cd9c89dc9a988228d8a2639a58e6c",
             distributionSha256Sum,
         )
     }
