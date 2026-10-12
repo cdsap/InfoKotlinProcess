@@ -40,10 +40,7 @@ class DevelocityWrapperConfiguration {
 
         buildScanExtension.buildScan.buildFinished {
             val processes =
-                collectKotlinProcesses(
-                    providers.jStat,
-                    providers.jInfo,
-                )
+                collectKotlinProcesses(providers)
             DevelocityValues(buildScanExtension, processes, gbosEnabled.get())
                 .addProcessesInfoToBuildScan()
         }
