@@ -34,7 +34,7 @@ class KotlinProcessCollectorOwnershipTest {
     }
 
     @Test
-    fun reportingAdaptersUseSharedProviderMaterializationHelper() {
+    fun reportingAdaptersUseKotlinProcessProvidersCollectionOperation() {
         val consolidation =
             locateMainKotlinSources()
                 .single { it.name == "KotlinProcessConsolidation.kt" }
@@ -53,12 +53,12 @@ class KotlinProcessCollectorOwnershipTest {
             consolidation.contains("KotlinProcessCollector().collect("),
         )
         assertTrue(
-            "InfoKotlinProcessBuildService must use collectKotlinProcesses",
-            buildService.contains("collectKotlinProcesses("),
+            "InfoKotlinProcessBuildService must use KotlinProcessProviders.collect",
+            buildService.contains(").collect()"),
         )
         assertTrue(
-            "DevelocityWrapperConfiguration must use collectKotlinProcesses",
-            develocity.contains("collectKotlinProcesses("),
+            "DevelocityWrapperConfiguration must use KotlinProcessProviders.collect",
+            develocity.contains("providers.collect()"),
         )
         assertFalse(
             "InfoKotlinProcessBuildService must not call KotlinProcessCollector directly",

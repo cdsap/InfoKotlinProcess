@@ -16,14 +16,14 @@ class KotlinProcessConsolidationTest {
     }
 
     @Test
-    fun collectKotlinProcessesMaterializesKotlinProcessProvidersAndDelegatesToCollector() {
+    fun kotlinProcessProvidersCollectMaterializesProvidersAndDelegatesToCollector() {
         val project = ProjectBuilder.builder().build()
         val jStat = project.providers.provider { jStatWithPid }
         val jInfo = project.providers.provider { jInfoWithPid }
 
         assertEquals(
             KotlinProcessCollector().collect(jStatWithPid, jInfoWithPid),
-            collectKotlinProcesses(KotlinProcessProviders(jStat = jStat, jInfo = jInfo)),
+            KotlinProcessProviders(jStat = jStat, jInfo = jInfo).collect(),
         )
     }
 
