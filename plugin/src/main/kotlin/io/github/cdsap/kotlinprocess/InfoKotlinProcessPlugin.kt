@@ -27,14 +27,16 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
         // projectsLoaded runs after the settings script and before project evaluation,
         // so settings DSL values are final and the root extension is visible to build scripts.
         settings.gradle.projectsLoaded {
-            val gbosEnabled = settingsExtension.gbos.develocity.get()
+            val gbosJson = settingsExtension.gbos.json.get()
+            val gbosNdjson = settingsExtension.gbos.ndjson.get()
             val projectExtension =
                 rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
                     ?: rootProject.extensions.create(
                         "infoKotlinProcess",
                         InfoKotlinProcessExtension::class.java,
                     )
-            projectExtension.gbos.develocity.convention(gbosEnabled)
+            projectExtension.gbos.json.convention(gbosJson)
+            projectExtension.gbos.ndjson.convention(gbosNdjson)
             configureProject(rootProject, projectExtension)
         }
     }
@@ -74,7 +76,11 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
             val scanConfigured =
                 try {
                     DevelocityWrapperConfiguration()
-                        .configureProjectWithDevelocityIfPresent(target, extension.gbos.develocity)
+                        .configureProjectWithDevelocityIfPresent(
+                            target,
+                            extension.gbos.json,
+                            extension.gbos.ndjson,
+                        )
                 } catch (_: NoClassDefFoundError) {
                     false
                 } catch (_: ExceptionInInitializerError) {
@@ -87,15 +93,18 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
 
             target.pluginManager.withPlugin("com.gradle.develocity") {
                 DevelocityWrapperConfiguration()
-                    .configureProjectWithDevelocity(target, extension.gbos.develocity)
+                    .configureProjectWithDevelocity(target, extension.gbos.json, extension.gbos.ndjson)
             }
 
             if (!target.pluginManager.hasPlugin("com.gradle.develocity")) {
-                consoleReporting(target)
+                processReporting(target, extension)
             }
         }
 
-        private fun consoleReporting(project: Project) {
+        private fun processReporting(
+            project: Project,
+            extension: InfoKotlinProcessExtension,
+        ) {
             val providers = project.kotlinProcessProviders()
             val service =
                 project.gradle.sharedServices.registerIfAbsent(
@@ -104,6 +113,10 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
                 ) {
                     parameters.jInfoProvider = providers.jInfo
                     parameters.jStatProvider = providers.jStat
+                    parameters.gbosJsonOutput.set(extension.gbos.json)
+                    parameters.gbosNdjsonOutput.set(extension.gbos.ndjson)
+                    parameters.gbosJsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.json"))
+                    parameters.gbosNdjsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.ndjson"))
                 }
             project.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(service)
         }

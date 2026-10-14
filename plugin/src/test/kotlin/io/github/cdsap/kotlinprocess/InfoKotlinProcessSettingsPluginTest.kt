@@ -98,11 +98,12 @@ class InfoKotlinProcessSettingsPluginTest {
             }
             infoKotlinProcess {
                 gbos {
-                    develocity.set(true)
+                    json.set(true)
+                    ndjson.set(true)
                 }
             }
-            if (!infoKotlinProcess.gbos.develocity.get()) {
-                throw GradleException("GBOS Develocity opt-in was not applied from settings")
+            if (!infoKotlinProcess.gbos.json.get() || !infoKotlinProcess.gbos.ndjson.get()) {
+                throw GradleException("GBOS file opt-in was not applied from settings")
             }
             rootProject.name = "settings-gbos-opt-in"
             """.trimIndent(),
@@ -114,8 +115,8 @@ class InfoKotlinProcessSettingsPluginTest {
                     val extension =
                         project.extensions.getByName("infoKotlinProcess")
                             as io.github.cdsap.kotlinprocess.InfoKotlinProcessExtension
-                    if (!extension.gbos.develocity.get()) {
-                        throw GradleException("GBOS Develocity opt-in was not mirrored to the root project")
+                    if (!extension.gbos.json.get() || !extension.gbos.ndjson.get()) {
+                        throw GradleException("GBOS file opt-in was not mirrored to the root project")
                     }
                 }
             }

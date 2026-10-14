@@ -1,6 +1,9 @@
 package io.github.cdsap.kotlinprocess
 
 import io.github.cdsap.kotlinprocess.output.ConsoleOutput
+import io.github.cdsap.kotlinprocess.output.GbosOutputReport
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
@@ -14,6 +17,10 @@ abstract class InfoKotlinProcessBuildService :
     interface Params : BuildServiceParameters {
         var jInfoProvider: Provider<String>
         var jStatProvider: Provider<String>
+        val gbosJsonOutput: Property<Boolean>
+        val gbosNdjsonOutput: Property<Boolean>
+        val gbosJsonFile: RegularFileProperty
+        val gbosNdjsonFile: RegularFileProperty
     }
 
     override fun close() {
@@ -25,6 +32,8 @@ abstract class InfoKotlinProcessBuildService :
         if (processes.isNotEmpty()) {
             ConsoleOutput(processes).print()
         }
+        GbosOutputReport(parameters.gbosJsonFile.get().asFile, parameters.gbosNdjsonFile.get().asFile)
+            .write(processes, parameters.gbosJsonOutput.get(), parameters.gbosNdjsonOutput.get())
     }
 
     override fun onFinish(event: FinishEvent?) {}
