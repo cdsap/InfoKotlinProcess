@@ -12,7 +12,7 @@ class InfoKotlinProcessNoDVTest {
     val testProjectDir = TemporaryFolder()
 
     @Test
-    fun gbosDevelocityOptInDefaultsOffAndCanBeEnabledInDsl() {
+    fun gbosFileSinksDefaultOffAndCanBeEnabledInDsl() {
         testProjectDir.newFile("settings.gradle").writeText("")
         testProjectDir.newFile("build.gradle").writeText(
             """
@@ -20,21 +20,22 @@ class InfoKotlinProcessNoDVTest {
                 id 'io.github.cdsap.kotlinprocess'
             }
 
-            if (infoKotlinProcess.gbos.develocity.get()) {
-                throw new GradleException('GBOS Develocity reporting should default to off')
+            if (infoKotlinProcess.gbos.json.get() || infoKotlinProcess.gbos.ndjson.get()) {
+                throw new GradleException('GBOS file reporting should default to off')
             }
 
             infoKotlinProcess {
                 gbos {
-                    develocity.set(true)
+                    json.set(true)
+                    ndjson.set(true)
                 }
             }
 
             tasks.register('assertGbosOptIn') {
-                inputs.property('gbosEnabled', infoKotlinProcess.gbos.develocity)
+                inputs.property('gbosEnabled', infoKotlinProcess.gbos.json)
                 doLast {
                     if (inputs.properties['gbosEnabled'] != true) {
-                        throw new GradleException('GBOS Develocity opt-in was not applied')
+                        throw new GradleException('GBOS file opt-in was not applied')
                     }
                 }
             }

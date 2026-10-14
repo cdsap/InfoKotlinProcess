@@ -79,7 +79,7 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosOptInReplacesLegacyValuesWithHeaderAndOneObservationPerDaemon() {
+    fun gbosOptInRetainsLegacyValuesAndAddsHeaderAndOneObservationPerDaemon() {
         val values =
             DevelocityCustomValues.from(
                 collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON),
@@ -87,13 +87,15 @@ class CharacterizationTest {
             )
 
         assertEquals(
-            GBOS_HEADER_KEYS + listOf(OBSERVATION_KEY, OBSERVATION_KEY),
+            (G1_LEGACY_VALUES + PARALLEL_LEGACY_VALUES).map { it.substringBefore('=') } + GBOS_HEADER_KEYS +
+                listOf(OBSERVATION_KEY, OBSERVATION_KEY),
             values.map { it.first },
         )
-        assertEquals(GBOS_HEADER_VALUES, values.take(3).map { it.second })
-        assertG1Observation(values[3].second)
+        val legacyCount = G1_LEGACY_VALUES.size + PARALLEL_LEGACY_VALUES.size
+        assertEquals(GBOS_HEADER_VALUES, values.drop(legacyCount).take(3).map { it.second })
+        assertG1Observation(values[legacyCount + 3].second)
         assertObservation(
-            values[4].second,
+            values[legacyCount + 4].second,
             pid = 23456,
             gcName = "Parallel",
             heapLimitBytes = 2147483648.0,
@@ -206,7 +208,7 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosGradlePropertyReplacesLegacyBuildScanValues() {
+    fun gbosGradlePropertyRetainsLegacyBuildScanValues() {
         val output =
             build(
                 settingsProject(DEVELOCITY_THEN_PLUGIN),
@@ -215,9 +217,13 @@ class CharacterizationTest {
             )
         val values = output.scanValues().map { it.substringBefore('=') to it.substringAfter('=') }
 
-        assertEquals(output, GBOS_HEADER_KEYS + OBSERVATION_KEY, values.map { it.first })
-        assertEquals(output, GBOS_HEADER_VALUES, values.take(3).map { it.second })
-        assertG1Observation(values[3].second)
+        assertEquals(
+            output,
+            G1_LEGACY_VALUES.map { it.substringBefore('=') } + GBOS_HEADER_KEYS + OBSERVATION_KEY,
+            values.map { it.first },
+        )
+        assertEquals(output, GBOS_HEADER_VALUES, values.drop(G1_LEGACY_VALUES.size).take(3).map { it.second })
+        assertG1Observation(values[G1_LEGACY_VALUES.size + 3].second)
         assertEquals(output, emptyList<String>(), output.consoleTables())
     }
 
@@ -417,7 +423,7 @@ class CharacterizationTest {
 
     private companion object {
         const val GRADLE_VERSION = "8.14.2"
-        const val GBOS_PROPERTY = "infoKotlinProcess.gbos.develocity.enabled"
+        const val GBOS_PROPERTY = "infoKotlinProcess.gbos.json.enabled"
         const val FAKE_DEVELOCITY_DESCRIPTOR = "META-INF/gradle-plugins/com.gradle.develocity.properties"
         const val OBSERVATION_KEY = "gbos.v1.producer.info_kotlin_process.observation"
 
@@ -445,6 +451,16 @@ class CharacterizationTest {
                 "Kotlin-Process-12345-uptime=18.63 minutes",
                 "Kotlin-Process-12345-gcTime=0.01 minutes",
                 "Kotlin-Process-12345-gcType=-XX:+UseG1GC",
+            )
+
+        val PARALLEL_LEGACY_VALUES =
+            listOf(
+                "Kotlin-Process-23456-max=2.0 GB",
+                "Kotlin-Process-23456-usage=1.0 GB",
+                "Kotlin-Process-23456-capacity=1.52 GB",
+                "Kotlin-Process-23456-uptime=60.0 minutes",
+                "Kotlin-Process-23456-gcTime=2.0 minutes",
+                "Kotlin-Process-23456-gcType=-XX:+UseParallelGC",
             )
 
         val GBOS_HEADER_KEYS =

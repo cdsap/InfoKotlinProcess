@@ -1,6 +1,7 @@
 package io.github.cdsap.kotlinprocess.output
 
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import io.github.cdsap.gbos.core.GbosAttributeValue
 import io.github.cdsap.gbos.core.GbosMeasurement
 import io.github.cdsap.gbos.core.GbosObservation
@@ -13,11 +14,8 @@ internal object DevelocityCustomValues {
         processes: List<Process>,
         gbosEnabled: Boolean,
     ): List<Pair<String, String>> =
-        if (gbosEnabled) {
-            GbosDevelocityProjection.values(processes)
-        } else {
-            processes.flatMap(::legacyValues)
-        }
+        processes.flatMap(::legacyValues) +
+            if (gbosEnabled) GbosDevelocityProjection.values(processes) else emptyList()
 
     private fun legacyValues(process: Process): List<Pair<String, String>> =
         listOf(
@@ -36,6 +34,31 @@ internal object GbosDevelocityProjection {
     const val PRODUCER_NAME = "info-kotlin-process"
     const val PRODUCER_NAMESPACE = "gbos.v1.producer.info_kotlin_process"
     const val OBSERVATION_VALUE = "$PRODUCER_NAMESPACE.observation"
+
+    fun reportJson(processes: List<Process>): String {
+        val observations = processes.map(::fullObservation)
+        return JsonOutput.prettyPrint(
+            JsonOutput.toJson(
+                linkedMapOf(
+                    "schemaVersion" to SCHEMA_VERSION,
+                    "resource" to linkedMapOf("build.tool.name" to "gradle"),
+                    "observations" to observations,
+                ),
+            ),
+        )
+    }
+
+    fun ndjson(processes: List<Process>): String =
+        processes.joinToString("\n", postfix = "\n") { process ->
+            JsonOutput.toJson(fullObservation(process))
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun fullObservation(process: Process): MutableMap<String, Any?> =
+        (JsonSlurper().parseText(observation(process)) as MutableMap<String, Any?>).apply {
+            put("schemaVersion", SCHEMA_VERSION)
+            put("producer", linkedMapOf("name" to PRODUCER_NAME, "version" to CONTRACT_VERSION))
+        }
 
     fun values(processes: List<Process>): List<Pair<String, String>> {
         if (processes.isEmpty()) return emptyList()

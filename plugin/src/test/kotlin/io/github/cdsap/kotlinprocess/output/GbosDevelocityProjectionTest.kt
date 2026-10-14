@@ -49,11 +49,12 @@ class GbosDevelocityProjectionTest {
     }
 
     @Test
-    fun gbosAndLegacyBuildScanValuesAreMutuallyExclusive() {
+    fun gbosBuildScanValuesRetainLegacyValuesForCompatibility() {
         val gbosValues = DevelocityCustomValues.from(listOf(process), gbosEnabled = true)
         val legacyValues = DevelocityCustomValues.from(listOf(process), gbosEnabled = false)
 
-        assertTrue(gbosValues.all { (name, _) -> name.startsWith("gbos.") })
+        assertTrue(gbosValues.any { (name, _) -> name.startsWith("gbos.") })
+        assertTrue(gbosValues.any { (name, _) -> name.startsWith("Kotlin-Process-") })
         assertFalse(legacyValues.any { (name, _) -> name.startsWith("gbos.") })
         assertTrue(legacyValues.all { (name, _) -> name.startsWith("Kotlin-Process-") })
         assertTrue(legacyValues.any { (name, _) -> name.endsWith("-max") })
@@ -61,7 +62,10 @@ class GbosDevelocityProjectionTest {
 
     @Test
     fun outputValidatesAgainstThePublishedGbosSchemas() {
-        val values = DevelocityCustomValues.from(listOf(process), gbosEnabled = true)
+        val values =
+            DevelocityCustomValues
+                .from(listOf(process), gbosEnabled = true)
+                .filter { (name, _) -> name.startsWith("gbos.") }
         val resources = javaClass.classLoader
         val schemaRegistry = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12)
         val projectionSchema =
