@@ -15,9 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.PrintStream
 
 /**
  * Characterization (golden) tests pinning what consumers of the plugin observe today:
@@ -108,7 +106,7 @@ class CharacterizationTest {
 
     @Test
     fun consoleTablePinsTitleHeaderColumnsAndRowFormat() {
-        assertEquals(G1_CONSOLE_TABLE, captureConsole(collect(FakeJdkTools.G1_DAEMON)))
+        assertEquals(G1_CONSOLE_TABLE, renderConsole(collect(FakeJdkTools.G1_DAEMON)))
         assertEquals(
             """
             ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -121,7 +119,7 @@ class CharacterizationTest {
             │  23456  │  2.0 Gb  │  1.0 Gb   │  1.52 Gb   │  2.0 minutes   │  -XX:+UseParallelGC  │  60.0 minutes   │
             └─────────┴──────────┴───────────┴────────────┴────────────────┴──────────────────────┴─────────────────┘
             """.trimIndent(),
-            captureConsole(collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON)),
+            renderConsole(collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON)),
         )
     }
 
@@ -295,17 +293,7 @@ class CharacterizationTest {
             FakeJdkTools.jInfoOutput(daemons.toList()),
         )
 
-    private fun captureConsole(processes: List<Process>): String {
-        val original = System.out
-        val captured = ByteArrayOutputStream()
-        System.setOut(PrintStream(captured, true, Charsets.UTF_8.name()))
-        try {
-            ConsoleOutput(processes).print()
-        } finally {
-            System.setOut(original)
-        }
-        return captured.toString(Charsets.UTF_8.name()).trimEnd()
-    }
+    private fun renderConsole(processes: List<Process>): String = ConsoleOutput(processes).render()
 
     private fun assertG1Observation(json: String) =
         assertObservation(
