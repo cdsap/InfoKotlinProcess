@@ -20,19 +20,18 @@ class InfoKotlinProcessNoDVTest {
                 id 'io.github.cdsap.kotlinprocess'
             }
 
-            if (infoKotlinProcess.gbos.json.get() || infoKotlinProcess.gbos.ndjson.get()) {
+            if (infoKotlinProcess.gbos.enabled.get()) {
                 throw new GradleException('GBOS file reporting should default to off')
             }
 
             infoKotlinProcess {
                 gbos {
-                    json.set(true)
-                    ndjson.set(true)
+                    enabled.set(true)
                 }
             }
 
             tasks.register('assertGbosOptIn') {
-                inputs.property('gbosEnabled', infoKotlinProcess.gbos.json)
+                inputs.property('gbosEnabled', infoKotlinProcess.gbos.enabled)
                 doLast {
                     if (inputs.properties['gbosEnabled'] != true) {
                         throw new GradleException('GBOS file opt-in was not applied')

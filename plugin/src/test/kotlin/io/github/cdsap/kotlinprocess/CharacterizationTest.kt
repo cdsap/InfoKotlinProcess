@@ -423,7 +423,7 @@ class CharacterizationTest {
 
     private companion object {
         const val GRADLE_VERSION = "8.14.2"
-        const val GBOS_PROPERTY = "infoKotlinProcess.gbos.json.enabled"
+        const val GBOS_PROPERTY = "infoKotlinProcess.gbos.enabled"
         const val FAKE_DEVELOCITY_DESCRIPTOR = "META-INF/gradle-plugins/com.gradle.develocity.properties"
         const val OBSERVATION_KEY = "gbos.v1.producer.info_kotlin_process.observation"
 

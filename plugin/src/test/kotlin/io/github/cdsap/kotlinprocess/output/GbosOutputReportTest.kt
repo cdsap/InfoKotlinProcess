@@ -25,7 +25,7 @@ class GbosOutputReportTest {
         val json = temporaryFolder.newFile("gbos.json")
         val ndjson = temporaryFolder.newFile("gbos.ndjson")
 
-        GbosOutputReport(json, ndjson).write(listOf(process), writeJson = true, writeNdjson = true)
+        GbosOutputReport(json, ndjson).write(listOf(process), enabled = true)
 
         assertTrue(json.readText().contains("\"schemaVersion\": \"1.0.0\""))
         assertTrue(json.readText().contains("\"scope\": \"jvm.process\""))
@@ -54,7 +54,7 @@ class GbosOutputReportTest {
         val invalid = process.copy(pid = "not-a-number")
 
         try {
-            GbosOutputReport(json, ndjson).write(listOf(invalid), writeJson = true, writeNdjson = true)
+            GbosOutputReport(json, ndjson).write(listOf(invalid), enabled = true)
         } catch (_: IllegalArgumentException) {
             // Expected: canonical observation generation validates the PID before any replacement.
         }

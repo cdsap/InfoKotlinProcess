@@ -27,16 +27,14 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
         // projectsLoaded runs after the settings script and before project evaluation,
         // so settings DSL values are final and the root extension is visible to build scripts.
         settings.gradle.projectsLoaded {
-            val gbosJson = settingsExtension.gbos.json.get()
-            val gbosNdjson = settingsExtension.gbos.ndjson.get()
+            val gbosEnabled = settingsExtension.gbos.enabled.get()
             val projectExtension =
                 rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
                     ?: rootProject.extensions.create(
                         "infoKotlinProcess",
                         InfoKotlinProcessExtension::class.java,
                     )
-            projectExtension.gbos.json.convention(gbosJson)
-            projectExtension.gbos.ndjson.convention(gbosNdjson)
+            projectExtension.gbos.enabled.convention(gbosEnabled)
             configureProject(rootProject, projectExtension)
         }
     }
@@ -78,8 +76,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
                     DevelocityWrapperConfiguration()
                         .configureProjectWithDevelocityIfPresent(
                             target,
-                            extension.gbos.json,
-                            extension.gbos.ndjson,
+                            extension.gbos.enabled,
                         )
                 } catch (_: NoClassDefFoundError) {
                     false
@@ -93,7 +90,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
 
             target.pluginManager.withPlugin("com.gradle.develocity") {
                 DevelocityWrapperConfiguration()
-                    .configureProjectWithDevelocity(target, extension.gbos.json, extension.gbos.ndjson)
+                    .configureProjectWithDevelocity(target, extension.gbos.enabled)
             }
 
             if (!target.pluginManager.hasPlugin("com.gradle.develocity")) {
@@ -113,8 +110,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
                 ) {
                     parameters.jInfoProvider = providers.jInfo
                     parameters.jStatProvider = providers.jStat
-                    parameters.gbosJsonOutput.set(extension.gbos.json)
-                    parameters.gbosNdjsonOutput.set(extension.gbos.ndjson)
+                    parameters.gbosEnabled.set(extension.gbos.enabled)
                     parameters.gbosJsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.json"))
                     parameters.gbosNdjsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.ndjson"))
                 }
