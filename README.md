@@ -77,7 +77,8 @@ The field `Usage` represents the value obtained at the end of the build using `j
 
 #### GBOS observations
 
-Build Scan GBOS output is opt-in. Enable it with a Gradle property:
+GBOS file sinks and the GBOS Develocity projection are independent opt-in sinks. Enable
+the file formats with Gradle properties:
 
 ```properties
 infoKotlinProcess.gbos.json.enabled=true
@@ -91,13 +92,40 @@ infoKotlinProcess {
     gbos {
         json.set(true)
         ndjson.set(true)
+        develocity.set(true)
+    }
+    legacy {
+        enabled.set(false)
     }
 }
 ```
 
-When enabled, GBOS observations are written locally and published to an available Develocity Build Scan
-alongside the legacy `Kotlin-Process-*` custom values. Without opt-in, the existing custom values and
-console output are unchanged. Each Kotlin daemon is reported as a `jvm.process` entity observation.
+The equivalent properties are:
+
+```properties
+infoKotlinProcess.gbos.develocity.enabled=true
+infoKotlinProcess.legacy.enabled=true
+```
+
+Develocity is detected automatically. Its custom-value matrix is:
+
+| Develocity | GBOS Develocity | Legacy output | Custom values |
+| --- | --- | --- | --- |
+| absent | any | any | no custom values; selected JSON/NDJSON files are still written |
+| present | off | on | legacy `Kotlin-Process-*` values |
+| present | on | off | only `gbos.*` values |
+| present | on | on | `gbos.*` and legacy `Kotlin-Process-*` values |
+| present | off | off | no custom values |
+
+The table applies independently to all four JSON/NDJSON sink combinations: neither,
+JSON only, NDJSON only, and both. Those flags select local files and do not change the
+Develocity column.
+
+`infoKotlinProcess.gbos.json.enabled` and `infoKotlinProcess.gbos.ndjson.enabled` only
+control their respective local files; they do not enable the Develocity projection.
+Legacy Develocity values are enabled by default for compatibility and can be disabled with
+`infoKotlinProcess.legacy.enabled=false`. Each Kotlin daemon is reported as a `jvm.process`
+entity observation.
 
 The JSON and NDJSON files are written atomically to `${rootDir}/build/info-kotlin-process/gbos.json`
 and `${rootDir}/build/info-kotlin-process/gbos.ndjson`. Each build replaces the selected file with

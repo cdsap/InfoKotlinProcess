@@ -11,13 +11,23 @@ abstract class InfoKotlinProcessExtension
         objects: ObjectFactory,
     ) {
         val gbos: GbosReportingExtension = objects.newInstance(GbosReportingExtension::class.java)
+        val legacy: LegacyReportingExtension = objects.newInstance(LegacyReportingExtension::class.java)
 
         fun gbos(action: Action<in GbosReportingExtension>) {
             action.execute(gbos)
+        }
+
+        fun legacy(action: Action<in LegacyReportingExtension>) {
+            action.execute(legacy)
         }
     }
 
 abstract class GbosReportingExtension {
     abstract val json: Property<Boolean>
     abstract val ndjson: Property<Boolean>
+    abstract val develocity: Property<Boolean>
+}
+
+abstract class LegacyReportingExtension {
+    abstract val enabled: Property<Boolean>
 }

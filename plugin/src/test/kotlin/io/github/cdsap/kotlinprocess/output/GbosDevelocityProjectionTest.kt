@@ -61,6 +61,44 @@ class GbosDevelocityProjectionTest {
     }
 
     @Test
+    fun develocityCustomValuesFollowIndependentGbosAndLegacySwitches() {
+        val cases =
+            listOf(
+                false to false,
+                false to true,
+                true to false,
+                true to true,
+            )
+        cases.forEach { (gbosEnabled, legacyEnabled) ->
+            val names =
+                DevelocityCustomValues
+                    .from(listOf(process), gbosEnabled, legacyEnabled)
+                    .map { it.first }
+            assertEquals(
+                when {
+                    gbosEnabled && legacyEnabled ->
+                        listOf(
+                            "Kotlin-Process-9011-max",
+                            "Kotlin-Process-9011-usage",
+                            "Kotlin-Process-9011-capacity",
+                            "Kotlin-Process-9011-uptime",
+                            "Kotlin-Process-9011-gcTime",
+                            "Kotlin-Process-9011-gcType",
+                            "gbos.schema",
+                            "gbos.v1.producer.info_kotlin_process.name",
+                            "gbos.v1.producer.info_kotlin_process.version",
+                            GbosDevelocityProjection.OBSERVATION_VALUE,
+                        )
+                    gbosEnabled -> GbosDevelocityProjection.values(listOf(process)).map { it.first }
+                    legacyEnabled -> DevelocityCustomValues.from(listOf(process), false).map { it.first }
+                    else -> emptyList()
+                },
+                names,
+            )
+        }
+    }
+
+    @Test
     fun outputValidatesAgainstThePublishedGbosSchemas() {
         val values =
             DevelocityCustomValues
