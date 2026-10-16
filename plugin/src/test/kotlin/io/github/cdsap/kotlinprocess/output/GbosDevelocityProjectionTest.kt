@@ -49,12 +49,12 @@ class GbosDevelocityProjectionTest {
     }
 
     @Test
-    fun gbosBuildScanValuesRetainLegacyValuesForCompatibility() {
+    fun gbosOptInReplacesLegacyValues() {
         val gbosValues = DevelocityCustomValues.from(listOf(process), gbosEnabled = true)
         val legacyValues = DevelocityCustomValues.from(listOf(process), gbosEnabled = false)
 
         assertTrue(gbosValues.any { (name, _) -> name.startsWith("gbos.") })
-        assertTrue(gbosValues.any { (name, _) -> name.startsWith("Kotlin-Process-") })
+        assertFalse(gbosValues.any { (name, _) -> name.startsWith("Kotlin-Process-") })
         assertFalse(legacyValues.any { (name, _) -> name.startsWith("gbos.") })
         assertTrue(legacyValues.all { (name, _) -> name.startsWith("Kotlin-Process-") })
         assertTrue(legacyValues.any { (name, _) -> name.endsWith("-max") })

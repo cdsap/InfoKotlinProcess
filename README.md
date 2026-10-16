@@ -94,7 +94,7 @@ infoKotlinProcess {
 ```
 
 When enabled, GBOS observations are written locally (JSON and NDJSON) and published to an available
-Develocity Build Scan alongside the legacy `Kotlin-Process-*` custom values. Without opt-in, the
+Develocity Build Scan in place of the legacy `Kotlin-Process-*` custom values. Without opt-in, the
 existing custom values and console output are unchanged. Each Kotlin daemon is reported as a
 `jvm.process` entity observation.
 

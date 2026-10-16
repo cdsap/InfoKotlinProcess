@@ -79,7 +79,7 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosOptInRetainsLegacyValuesAndAddsHeaderAndOneObservationPerDaemon() {
+    fun gbosOptInReplacesLegacyWithHeaderAndOneObservationPerDaemon() {
         val values =
             DevelocityCustomValues.from(
                 collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON),
@@ -87,15 +87,13 @@ class CharacterizationTest {
             )
 
         assertEquals(
-            (G1_LEGACY_VALUES + PARALLEL_LEGACY_VALUES).map { it.substringBefore('=') } + GBOS_HEADER_KEYS +
-                listOf(OBSERVATION_KEY, OBSERVATION_KEY),
+            GBOS_HEADER_KEYS + listOf(OBSERVATION_KEY, OBSERVATION_KEY),
             values.map { it.first },
         )
-        val legacyCount = G1_LEGACY_VALUES.size + PARALLEL_LEGACY_VALUES.size
-        assertEquals(GBOS_HEADER_VALUES, values.drop(legacyCount).take(3).map { it.second })
-        assertG1Observation(values[legacyCount + 3].second)
+        assertEquals(GBOS_HEADER_VALUES, values.take(3).map { it.second })
+        assertG1Observation(values[3].second)
         assertObservation(
-            values[legacyCount + 4].second,
+            values[4].second,
             pid = 23456,
             gcName = "Parallel",
             heapLimitBytes = 2147483648.0,
@@ -208,7 +206,7 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosGradlePropertyRetainsLegacyBuildScanValues() {
+    fun gbosGradlePropertyReplacesLegacyBuildScanValues() {
         val output =
             build(
                 settingsProject(DEVELOCITY_THEN_PLUGIN),
@@ -219,11 +217,12 @@ class CharacterizationTest {
 
         assertEquals(
             output,
-            G1_LEGACY_VALUES.map { it.substringBefore('=') } + GBOS_HEADER_KEYS + OBSERVATION_KEY,
+            GBOS_HEADER_KEYS + OBSERVATION_KEY,
             values.map { it.first },
         )
-        assertEquals(output, GBOS_HEADER_VALUES, values.drop(G1_LEGACY_VALUES.size).take(3).map { it.second })
-        assertG1Observation(values[G1_LEGACY_VALUES.size + 3].second)
+        assertEquals(output, GBOS_HEADER_VALUES, values.take(3).map { it.second })
+        assertG1Observation(values[3].second)
+        assertFalse(output, values.any { it.first.startsWith("Kotlin-Process-") })
         assertEquals(output, emptyList<String>(), output.consoleTables())
     }
 
