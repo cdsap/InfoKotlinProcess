@@ -11,34 +11,22 @@ internal class GbosOutputReport(
 ) {
     fun write(
         processes: List<Process>,
-        writeJson: Boolean,
-        writeNdjson: Boolean,
+        enabled: Boolean,
     ) {
-        if (!writeJson && !writeNdjson) {
-            outputJson.delete()
-            outputNdjson.delete()
-            return
-        }
-        if (processes.isEmpty()) {
+        if (!enabled || processes.isEmpty()) {
             outputJson.delete()
             outputNdjson.delete()
             return
         }
 
-        // Generate every enabled sink before replacing an existing file. A bad observation
+        // Generate every sink before replacing an existing file. A bad observation
         // must not leave one sink from this build beside another sink from the previous one.
         val contents =
-            buildList {
-                if (writeJson) {
-                    add(outputJson to GbosDevelocityProjection.reportJson(processes))
-                }
-                if (writeNdjson) {
-                    add(outputNdjson to GbosDevelocityProjection.ndjson(processes))
-                }
-            }
+            listOf(
+                outputJson to GbosDevelocityProjection.reportJson(processes),
+                outputNdjson to GbosDevelocityProjection.ndjson(processes),
+            )
         contents.forEach { (output, content) -> replaceAtomically(output, content) }
-        if (!writeJson) outputJson.delete()
-        if (!writeNdjson) outputNdjson.delete()
     }
 
     private fun replaceAtomically(

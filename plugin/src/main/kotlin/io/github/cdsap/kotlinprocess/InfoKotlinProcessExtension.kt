@@ -18,6 +18,5 @@ abstract class InfoKotlinProcessExtension
     }
 
 abstract class GbosReportingExtension {
-    abstract val json: Property<Boolean>
-    abstract val ndjson: Property<Boolean>
+    abstract val enabled: Property<Boolean>
 }

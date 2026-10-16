@@ -14,8 +14,11 @@ internal object DevelocityCustomValues {
         processes: List<Process>,
         gbosEnabled: Boolean,
     ): List<Pair<String, String>> =
-        processes.flatMap(::legacyValues) +
-            if (gbosEnabled) GbosDevelocityProjection.values(processes) else emptyList()
+        if (gbosEnabled) {
+            GbosDevelocityProjection.values(processes)
+        } else {
+            processes.flatMap(::legacyValues)
+        }
 
     private fun legacyValues(process: Process): List<Pair<String, String>> =
         listOf(
