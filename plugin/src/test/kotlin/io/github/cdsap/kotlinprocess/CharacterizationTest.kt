@@ -150,6 +150,19 @@ class CharacterizationTest {
     }
 
     @Test
+    fun settingsAndProjectPluginApplicationsRegisterConsoleReportingOnce() {
+        val project =
+            project(
+                "settings.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
+                "build.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
+            )
+
+        val output = build(project, develocity = false)
+
+        assertEquals(output, listOf(G1_CONSOLE_TABLE), output.consoleTables())
+    }
+
+    @Test
     fun withoutKotlinDaemonNothingIsReported() {
         val withoutDevelocity = project("build.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }")
         val withDevelocity = settingsProject(DEVELOCITY_THEN_PLUGIN)
