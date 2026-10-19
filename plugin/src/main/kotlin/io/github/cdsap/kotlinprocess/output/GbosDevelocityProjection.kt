@@ -13,12 +13,10 @@ internal object DevelocityCustomValues {
     fun from(
         processes: List<Process>,
         gbosEnabled: Boolean,
+        legacyEnabled: Boolean = !gbosEnabled,
     ): List<Pair<String, String>> =
-        if (gbosEnabled) {
-            GbosDevelocityProjection.values(processes)
-        } else {
-            processes.flatMap(::legacyValues)
-        }
+        (if (legacyEnabled) processes.flatMap(::legacyValues) else emptyList()) +
+            if (gbosEnabled) GbosDevelocityProjection.values(processes) else emptyList()
 
     private fun legacyValues(process: Process): List<Pair<String, String>> =
         listOf(

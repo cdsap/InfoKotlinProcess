@@ -34,7 +34,7 @@ class KotlinProcessCollectorOwnershipTest {
     }
 
     @Test
-    fun reportingAdaptersUseKotlinProcessSnapshot() {
+    fun reportingAdaptersUseExplicitProcessCollectionBoundary() {
         val consolidation =
             locateMainKotlinSources()
                 .single { it.name == "KotlinProcessConsolidation.kt" }
@@ -53,12 +53,16 @@ class KotlinProcessCollectorOwnershipTest {
             consolidation.contains("KotlinProcessCollector().collect("),
         )
         assertTrue(
-            "InfoKotlinProcessBuildService must use KotlinProcessSnapshot",
-            buildService.contains("KotlinProcessSnapshot") && buildService.contains(").collect()"),
+            "KotlinProcessConsolidation must expose one provider bundle boundary",
+            consolidation.contains("internal fun collectKotlinProcesses(providers: KotlinProcessProviders)"),
         )
         assertTrue(
-            "DevelocityWrapperConfiguration must use KotlinProcessSnapshot",
-            develocity.contains("KotlinProcessSnapshot") && develocity.contains("snapshot.collect()"),
+            "InfoKotlinProcessBuildService must use collectKotlinProcesses",
+            buildService.contains("collectKotlinProcesses("),
+        )
+        assertTrue(
+            "DevelocityWrapperConfiguration must use collectKotlinProcesses",
+            develocity.contains("collectKotlinProcesses("),
         )
         assertFalse(
             "InfoKotlinProcessBuildService must not call KotlinProcessCollector directly",

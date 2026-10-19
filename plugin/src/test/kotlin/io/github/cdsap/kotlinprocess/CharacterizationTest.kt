@@ -15,9 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.PrintStream
 
 /**
  * Characterization (golden) tests pinning what consumers of the plugin observe today:
@@ -79,7 +77,7 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosOptInReplacesLegacyWithHeaderAndOneObservationPerDaemon() {
+    fun gbosOptInReplacesLegacyValuesWithHeaderAndOneObservationPerDaemon() {
         val values =
             DevelocityCustomValues.from(
                 collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON),
@@ -87,7 +85,8 @@ class CharacterizationTest {
             )
 
         assertEquals(
-            GBOS_HEADER_KEYS + listOf(OBSERVATION_KEY, OBSERVATION_KEY),
+            GBOS_HEADER_KEYS +
+                listOf(OBSERVATION_KEY, OBSERVATION_KEY),
             values.map { it.first },
         )
         assertEquals(GBOS_HEADER_VALUES, values.take(3).map { it.second })
@@ -106,7 +105,7 @@ class CharacterizationTest {
 
     @Test
     fun consoleTablePinsTitleHeaderColumnsAndRowFormat() {
-        assertEquals(G1_CONSOLE_TABLE, captureConsole(collect(FakeJdkTools.G1_DAEMON)))
+        assertEquals(G1_CONSOLE_TABLE, renderConsole(collect(FakeJdkTools.G1_DAEMON)))
         assertEquals(
             """
             ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐
@@ -119,7 +118,7 @@ class CharacterizationTest {
             │  23456  │  2.0 Gb  │  1.0 Gb   │  1.52 Gb   │  2.0 minutes   │  -XX:+UseParallelGC  │  60.0 minutes   │
             └─────────┴──────────┴───────────┴────────────┴────────────────┴──────────────────────┴─────────────────┘
             """.trimIndent(),
-            captureConsole(collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON)),
+            renderConsole(collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON)),
         )
     }
 
@@ -142,6 +141,19 @@ class CharacterizationTest {
             project(
                 "settings.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
                 "build.gradle" to "",
+            )
+
+        val output = build(project, develocity = false)
+
+        assertEquals(output, listOf(G1_CONSOLE_TABLE), output.consoleTables())
+    }
+
+    @Test
+    fun settingsAndProjectPluginApplicationsRegisterConsoleReportingOnce() {
+        val project =
+            project(
+                "settings.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
+                "build.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
             )
 
         val output = build(project, develocity = false)
@@ -222,8 +234,29 @@ class CharacterizationTest {
         )
         assertEquals(output, GBOS_HEADER_VALUES, values.take(3).map { it.second })
         assertG1Observation(values[3].second)
-        assertFalse(output, values.any { it.first.startsWith("Kotlin-Process-") })
         assertEquals(output, emptyList<String>(), output.consoleTables())
+    }
+
+    @Test
+    fun settingsAndProjectPluginUseTheSameGbosOptIn() {
+        val settings =
+            build(
+                settingsProject(DEVELOCITY_THEN_PLUGIN),
+                develocity = true,
+                "-P$GBOS_PROPERTY=true",
+            )
+        val project =
+            build(
+                project(
+                    "settings.gradle" to "plugins { id 'com.gradle.develocity' }",
+                    "build.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
+                ),
+                develocity = true,
+                "-P$GBOS_PROPERTY=true",
+            )
+
+        assertEquals(settings, project.scanValues(), settings.scanValues())
+        assertEquals(settings, GBOS_HEADER_KEYS + OBSERVATION_KEY, settings.scanValues().map { it.substringBefore('=') })
     }
 
     @Test
@@ -258,17 +291,7 @@ class CharacterizationTest {
             FakeJdkTools.jInfoOutput(daemons.toList()),
         )
 
-    private fun captureConsole(processes: List<Process>): String {
-        val original = System.out
-        val captured = ByteArrayOutputStream()
-        System.setOut(PrintStream(captured, true, Charsets.UTF_8.name()))
-        try {
-            ConsoleOutput(processes).print()
-        } finally {
-            System.setOut(original)
-        }
-        return captured.toString(Charsets.UTF_8.name()).trimEnd()
-    }
+    private fun renderConsole(processes: List<Process>): String = ConsoleOutput(processes).render()
 
     private fun assertG1Observation(json: String) =
         assertObservation(

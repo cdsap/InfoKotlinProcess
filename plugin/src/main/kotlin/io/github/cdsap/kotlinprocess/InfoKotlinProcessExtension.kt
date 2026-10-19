@@ -15,6 +15,7 @@ abstract class InfoKotlinProcessExtension
         fun gbos(action: Action<in GbosReportingExtension>) {
             action.execute(gbos)
         }
+
     }
 
 abstract class GbosReportingExtension {

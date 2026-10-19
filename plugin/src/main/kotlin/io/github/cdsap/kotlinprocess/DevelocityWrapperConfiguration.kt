@@ -37,14 +37,14 @@ class DevelocityWrapperConfiguration {
         buildScanExtension: DevelocityConfiguration,
         gbosEnabled: Provider<Boolean>,
     ) {
-        val snapshot = KotlinProcessSnapshot(project.kotlinProcessProviders())
+        val providers = project.kotlinProcessProviders()
         val gbosJsonFile = project.layout.buildDirectory.file("info-kotlin-process/gbos.json")
         val gbosNdjsonFile = project.layout.buildDirectory.file("info-kotlin-process/gbos.ndjson")
 
         buildScanExtension.buildScan.buildFinished {
-            val processes = snapshot.collect()
+            val processes = collectKotlinProcesses(providers)
             val enabled = gbosEnabled.get()
-            DevelocityValues(buildScanExtension, processes, enabled)
+            DevelocityValues(buildScanExtension, processes, enabled, legacyEnabled = !enabled)
                 .addProcessesInfoToBuildScan()
             GbosOutputReport(
                 gbosJsonFile.get().asFile,

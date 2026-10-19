@@ -77,7 +77,8 @@ The field `Usage` represents the value obtained at the end of the build using `j
 
 #### GBOS observations
 
-Build Scan GBOS output is opt-in. Enable it with a Gradle property:
+GBOS file sinks and the GBOS Develocity projection are enabled together with one opt-in
+property:
 
 ```properties
 infoKotlinProcess.gbos.enabled=true
@@ -93,10 +94,17 @@ infoKotlinProcess {
 }
 ```
 
-When enabled, GBOS observations are written locally (JSON and NDJSON) and published to an available
-Develocity Build Scan in place of the legacy `Kotlin-Process-*` custom values. Without opt-in, the
-existing custom values and console output are unchanged. Each Kotlin daemon is reported as a
-`jvm.process` entity observation.
+Develocity is detected automatically. Without the opt-in, legacy
+`Kotlin-Process-*` custom values remain unchanged. With the opt-in, the legacy
+values are replaced by the `gbos.*` projection:
+
+| Develocity | GBOS opt-in | Custom values |
+| --- | --- | --- |
+| absent | either | no custom values; GBOS files are written only when enabled |
+| present | off | legacy `Kotlin-Process-*` values |
+| present | on | only `gbos.*` values |
+
+Each Kotlin daemon is reported as a `jvm.process` entity observation.
 
 The JSON and NDJSON files are written atomically to `${rootDir}/build/info-kotlin-process/gbos.json`
 and `${rootDir}/build/info-kotlin-process/gbos.ndjson`. Each build replaces both files with

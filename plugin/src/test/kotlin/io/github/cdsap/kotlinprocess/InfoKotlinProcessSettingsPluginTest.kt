@@ -102,7 +102,7 @@ class InfoKotlinProcessSettingsPluginTest {
                 }
             }
             if (!infoKotlinProcess.gbos.enabled.get()) {
-                throw GradleException("GBOS file opt-in was not applied from settings")
+                throw GradleException("GBOS reporting option was not applied from settings")
             }
             rootProject.name = "settings-gbos-opt-in"
             """.trimIndent(),
@@ -115,7 +115,7 @@ class InfoKotlinProcessSettingsPluginTest {
                         project.extensions.getByName("infoKotlinProcess")
                             as io.github.cdsap.kotlinprocess.InfoKotlinProcessExtension
                     if (!extension.gbos.enabled.get()) {
-                        throw GradleException("GBOS file opt-in was not mirrored to the root project")
+                        throw GradleException("GBOS reporting option was not mirrored to the root project")
                     }
                 }
             }
