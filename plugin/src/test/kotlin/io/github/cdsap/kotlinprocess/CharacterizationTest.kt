@@ -6,7 +6,7 @@ import io.github.cdsap.jdk.tools.parser.model.TypeProcess
 import io.github.cdsap.kotlinprocess.fixtures.FakeDevelocityPlugin
 import io.github.cdsap.kotlinprocess.fixtures.FakeJdkTools
 import io.github.cdsap.kotlinprocess.fixtures.FakeKotlinDaemon
-import io.github.cdsap.kotlinprocess.output.ConsoleOutput
+import io.github.cdsap.kotlinprocess.output.ConsoleTableRenderer
 import io.github.cdsap.kotlinprocess.output.DevelocityCustomValues
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.Assert.assertEquals
@@ -291,7 +291,7 @@ class CharacterizationTest {
             FakeJdkTools.jInfoOutput(daemons.toList()),
         )
 
-    private fun renderConsole(processes: List<Process>): String = ConsoleOutput(processes).render()
+    private fun renderConsole(processes: List<Process>): String = ConsoleTableRenderer(processes).render()
 
     private fun assertG1Observation(json: String) =
         assertObservation(
