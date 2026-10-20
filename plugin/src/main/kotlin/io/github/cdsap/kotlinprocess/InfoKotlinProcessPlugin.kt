@@ -19,7 +19,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
             settings.extensions.create(
                 "infoKotlinProcess",
                 InfoKotlinProcessExtension::class.java,
-        )
+            )
         GbosOptIn.configureConventions(settingsExtension.gbos, settings.providers)
 
         // projectsLoaded runs after the settings script and before project evaluation,
