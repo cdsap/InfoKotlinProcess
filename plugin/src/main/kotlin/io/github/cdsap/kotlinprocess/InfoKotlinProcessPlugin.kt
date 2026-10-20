@@ -21,25 +21,18 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
                 InfoKotlinProcessExtension::class.java,
             )
         GbosOptIn.configureConventions(settingsExtension.gbos, settings.providers)
-        GbosOptIn.configureLegacyConventions(settingsExtension.legacy, settings.providers)
 
         // projectsLoaded runs after the settings script and before project evaluation,
         // so settings DSL values are final and the root extension is visible to build scripts.
         settings.gradle.projectsLoaded {
-            val gbosJson = settingsExtension.gbos.json.get()
-            val gbosNdjson = settingsExtension.gbos.ndjson.get()
-            val gbosDevelocity = settingsExtension.gbos.develocity.get()
-            val legacy = settingsExtension.legacy.enabled.get()
+            val gbosEnabled = settingsExtension.gbos.enabled.get()
             val projectExtension =
                 rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
                     ?: rootProject.extensions.create(
                         "infoKotlinProcess",
                         InfoKotlinProcessExtension::class.java,
                     )
-            projectExtension.gbos.json.convention(gbosJson)
-            projectExtension.gbos.ndjson.convention(gbosNdjson)
-            projectExtension.gbos.develocity.convention(gbosDevelocity)
-            projectExtension.legacy.enabled.convention(legacy)
+            projectExtension.gbos.enabled.convention(gbosEnabled)
             KotlinProcessReporting().configure(rootProject, projectExtension)
         }
     }
@@ -53,7 +46,6 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
                     InfoKotlinProcessExtension::class.java,
                 )
         GbosOptIn.configureConventions(extension.gbos, rootProject.providers)
-        GbosOptIn.configureLegacyConventions(extension.legacy, rootProject.providers)
 
         target.gradle.rootProject {
             KotlinProcessReporting().configure(target, extension)

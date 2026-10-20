@@ -24,10 +24,7 @@ internal class KotlinProcessReporting {
                 DevelocityWrapperConfiguration()
                     .configureProjectWithDevelocityIfPresent(
                         target,
-                        extension.gbos.json,
-                        extension.gbos.ndjson,
-                        extension.gbos.develocity,
-                        extension.legacy.enabled,
+                        extension.gbos.enabled,
                     )
             } catch (_: NoClassDefFoundError) {
                 false
@@ -43,10 +40,7 @@ internal class KotlinProcessReporting {
             DevelocityWrapperConfiguration()
                 .configureProjectWithDevelocity(
                     target,
-                    extension.gbos.json,
-                    extension.gbos.ndjson,
-                    extension.gbos.develocity,
-                    extension.legacy.enabled,
+                    extension.gbos.enabled,
                 )
         }
 
@@ -67,8 +61,7 @@ internal class KotlinProcessReporting {
             ) {
                 parameters.jInfoProvider = providers.jInfo
                 parameters.jStatProvider = providers.jStat
-                parameters.gbosJsonOutput.set(extension.gbos.json)
-                parameters.gbosNdjsonOutput.set(extension.gbos.ndjson)
+                parameters.gbosEnabled.set(extension.gbos.enabled)
                 parameters.gbosJsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.json"))
                 parameters.gbosNdjsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.ndjson"))
             }

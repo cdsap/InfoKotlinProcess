@@ -77,7 +77,7 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosOptInRetainsLegacyValuesAndAddsHeaderAndOneObservationPerDaemon() {
+    fun gbosOptInReplacesLegacyValuesWithHeaderAndOneObservationPerDaemon() {
         val values =
             DevelocityCustomValues.from(
                 collect(FakeJdkTools.G1_DAEMON, FakeJdkTools.PARALLEL_DAEMON),
@@ -85,15 +85,14 @@ class CharacterizationTest {
             )
 
         assertEquals(
-            (G1_LEGACY_VALUES + PARALLEL_LEGACY_VALUES).map { it.substringBefore('=') } + GBOS_HEADER_KEYS +
+            GBOS_HEADER_KEYS +
                 listOf(OBSERVATION_KEY, OBSERVATION_KEY),
             values.map { it.first },
         )
-        val legacyCount = G1_LEGACY_VALUES.size + PARALLEL_LEGACY_VALUES.size
-        assertEquals(GBOS_HEADER_VALUES, values.drop(legacyCount).take(3).map { it.second })
-        assertG1Observation(values[legacyCount + 3].second)
+        assertEquals(GBOS_HEADER_VALUES, values.take(3).map { it.second })
+        assertG1Observation(values[3].second)
         assertObservation(
-            values[legacyCount + 4].second,
+            values[4].second,
             pid = 23456,
             gcName = "Parallel",
             heapLimitBytes = 2147483648.0,
@@ -219,45 +218,32 @@ class CharacterizationTest {
     }
 
     @Test
-    fun gbosGradlePropertyRetainsLegacyBuildScanValues() {
-        val output =
-            build(
-                settingsProject(DEVELOCITY_THEN_PLUGIN),
-                develocity = true,
-                "-P$GBOS_DEVELOCITY_PROPERTY=true",
-            )
-        val values = output.scanValues().map { it.substringBefore('=') to it.substringAfter('=') }
-
-        assertEquals(
-            output,
-            G1_LEGACY_VALUES.map { it.substringBefore('=') } + GBOS_HEADER_KEYS + OBSERVATION_KEY,
-            values.map { it.first },
-        )
-        assertEquals(output, GBOS_HEADER_VALUES, values.drop(G1_LEGACY_VALUES.size).take(3).map { it.second })
-        assertG1Observation(values[G1_LEGACY_VALUES.size + 3].second)
-        assertEquals(output, emptyList<String>(), output.consoleTables())
-    }
-
-    @Test
-    fun gbosFilePropertyDoesNotEnableTheDevelocityProjection() {
+    fun gbosGradlePropertyReplacesLegacyBuildScanValues() {
         val output =
             build(
                 settingsProject(DEVELOCITY_THEN_PLUGIN),
                 develocity = true,
                 "-P$GBOS_PROPERTY=true",
             )
+        val values = output.scanValues().map { it.substringBefore('=') to it.substringAfter('=') }
 
-        assertEquals(output, G1_LEGACY_VALUES, output.scanValues())
+        assertEquals(
+            output,
+            GBOS_HEADER_KEYS + OBSERVATION_KEY,
+            values.map { it.first },
+        )
+        assertEquals(output, GBOS_HEADER_VALUES, values.take(3).map { it.second })
+        assertG1Observation(values[3].second)
+        assertEquals(output, emptyList<String>(), output.consoleTables())
     }
 
     @Test
-    fun settingsAndProjectPluginUseTheSameDevelocityMatrix() {
+    fun settingsAndProjectPluginUseTheSameGbosOptIn() {
         val settings =
             build(
                 settingsProject(DEVELOCITY_THEN_PLUGIN),
                 develocity = true,
-                "-P$GBOS_DEVELOCITY_PROPERTY=true",
-                "-P$LEGACY_PROPERTY=false",
+                "-P$GBOS_PROPERTY=true",
             )
         val project =
             build(
@@ -266,8 +252,7 @@ class CharacterizationTest {
                     "build.gradle" to "plugins { id 'io.github.cdsap.kotlinprocess' }",
                 ),
                 develocity = true,
-                "-P$GBOS_DEVELOCITY_PROPERTY=true",
-                "-P$LEGACY_PROPERTY=false",
+                "-P$GBOS_PROPERTY=true",
             )
 
         assertEquals(settings, project.scanValues(), settings.scanValues())
@@ -460,9 +445,7 @@ class CharacterizationTest {
 
     private companion object {
         const val GRADLE_VERSION = "8.14.2"
-        const val GBOS_PROPERTY = "infoKotlinProcess.gbos.json.enabled"
-        const val GBOS_DEVELOCITY_PROPERTY = "infoKotlinProcess.gbos.develocity.enabled"
-        const val LEGACY_PROPERTY = "infoKotlinProcess.legacy.enabled"
+        const val GBOS_PROPERTY = "infoKotlinProcess.gbos.enabled"
         const val FAKE_DEVELOCITY_DESCRIPTOR = "META-INF/gradle-plugins/com.gradle.develocity.properties"
         const val OBSERVATION_KEY = "gbos.v1.producer.info_kotlin_process.observation"
 

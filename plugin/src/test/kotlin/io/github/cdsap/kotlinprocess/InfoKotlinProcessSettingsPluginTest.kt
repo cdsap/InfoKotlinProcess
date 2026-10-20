@@ -98,20 +98,11 @@ class InfoKotlinProcessSettingsPluginTest {
             }
             infoKotlinProcess {
                 gbos {
-                    json.set(true)
-                    ndjson.set(true)
-                    develocity.set(true)
-                }
-                legacy {
-                    enabled.set(false)
+                    enabled.set(true)
                 }
             }
-            if (!infoKotlinProcess.gbos.json.get() ||
-                !infoKotlinProcess.gbos.ndjson.get() ||
-                !infoKotlinProcess.gbos.develocity.get() ||
-                infoKotlinProcess.legacy.enabled.get()
-            ) {
-                throw GradleException("GBOS and legacy reporting options were not applied from settings")
+            if (!infoKotlinProcess.gbos.enabled.get()) {
+                throw GradleException("GBOS reporting option was not applied from settings")
             }
             rootProject.name = "settings-gbos-opt-in"
             """.trimIndent(),
@@ -123,12 +114,8 @@ class InfoKotlinProcessSettingsPluginTest {
                     val extension =
                         project.extensions.getByName("infoKotlinProcess")
                             as io.github.cdsap.kotlinprocess.InfoKotlinProcessExtension
-                    if (!extension.gbos.json.get() ||
-                        !extension.gbos.ndjson.get() ||
-                        !extension.gbos.develocity.get() ||
-                        extension.legacy.enabled.get()
-                    ) {
-                        throw GradleException("GBOS and legacy reporting options were not mirrored to the root project")
+                    if (!extension.gbos.enabled.get()) {
+                        throw GradleException("GBOS reporting option was not mirrored to the root project")
                     }
                 }
             }

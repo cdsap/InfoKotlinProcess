@@ -17,8 +17,7 @@ abstract class InfoKotlinProcessBuildService :
     interface Params : BuildServiceParameters {
         var jInfoProvider: Provider<String>
         var jStatProvider: Provider<String>
-        val gbosJsonOutput: Property<Boolean>
-        val gbosNdjsonOutput: Property<Boolean>
+        val gbosEnabled: Property<Boolean>
         val gbosJsonFile: RegularFileProperty
         val gbosNdjsonFile: RegularFileProperty
     }
@@ -35,7 +34,7 @@ abstract class InfoKotlinProcessBuildService :
             ConsoleOutput(processes).print()
         }
         GbosOutputReport(parameters.gbosJsonFile.get().asFile, parameters.gbosNdjsonFile.get().asFile)
-            .write(processes, parameters.gbosJsonOutput.get(), parameters.gbosNdjsonOutput.get())
+            .write(processes, parameters.gbosEnabled.get())
     }
 
     override fun onFinish(event: FinishEvent?) {}
