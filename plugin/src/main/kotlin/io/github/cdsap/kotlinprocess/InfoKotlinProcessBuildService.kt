@@ -31,7 +31,7 @@ abstract class InfoKotlinProcessBuildService :
                 ),
             )
         if (processes.isNotEmpty()) {
-            ConsoleOutput(processes).print()
+            println(ConsoleOutput(processes).render())
         }
         GbosOutputReport(parameters.gbosJsonFile.get().asFile, parameters.gbosNdjsonFile.get().asFile)
             .write(processes, parameters.gbosEnabled.get())
