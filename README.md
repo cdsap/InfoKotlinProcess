@@ -77,8 +77,8 @@ The field `Usage` represents the value obtained at the end of the build using `j
 
 #### GBOS observations
 
-GBOS file sinks and the GBOS Develocity projection are enabled together with one opt-in
-property:
+GBOS file sinks and the GBOS Develocity projection are independent opt-ins. File output
+uses `infoKotlinProcess.gbos.enabled`:
 
 ```properties
 infoKotlinProcess.gbos.enabled=true
@@ -94,15 +94,23 @@ infoKotlinProcess {
 }
 ```
 
-Develocity is detected automatically. Without the opt-in, legacy
-`Kotlin-Process-*` custom values remain unchanged. With the opt-in, the legacy
-values are replaced by the `gbos.*` projection:
+The Develocity projection has its own opt-in:
 
-| Develocity | GBOS opt-in | Custom values |
-| --- | --- | --- |
-| absent | either | no custom values; GBOS files are written only when enabled |
-| present | off | legacy `Kotlin-Process-*` values |
-| present | on | only `gbos.*` values |
+```properties
+infoKotlinProcess.gbos.develocity.enabled=true
+```
+
+Develocity is detected automatically. Without the Develocity opt-in, legacy
+`Kotlin-Process-*` custom values remain unchanged. With it, the legacy values
+are replaced by the `gbos.*` projection. The two flags can be enabled independently:
+
+| Develocity | File GBOS | Develocity GBOS | Result |
+| --- | --- | --- | --- |
+| absent | off/on | off/on | no custom values; files follow the File GBOS flag |
+| present | off | off | legacy `Kotlin-Process-*` values |
+| present | on | off | legacy values plus GBOS files |
+| present | off | on | only `gbos.*` values |
+| present | on | on | only `gbos.*` values plus GBOS files |
 
 Each Kotlin daemon is reported as a `jvm.process` entity observation.
 

@@ -26,6 +26,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
         // so settings DSL values are final and the root extension is visible to build scripts.
         settings.gradle.projectsLoaded {
             val gbosEnabled = settingsExtension.gbos.enabled.get()
+            val gbosDevelocityEnabled = settingsExtension.gbos.develocity.get()
             val projectExtension =
                 rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
                     ?: rootProject.extensions.create(
@@ -33,6 +34,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
                         InfoKotlinProcessExtension::class.java,
                     )
             projectExtension.gbos.enabled.convention(gbosEnabled)
+            projectExtension.gbos.develocity.convention(gbosDevelocityEnabled)
             KotlinProcessReporting().configure(rootProject, projectExtension)
         }
     }
