@@ -25,6 +25,7 @@ internal class KotlinProcessReporting {
                     .configureProjectWithDevelocityIfPresent(
                         target,
                         extension.gbos.enabled,
+                        extension.gbos.develocity,
                     )
             } catch (_: NoClassDefFoundError) {
                 false
@@ -41,6 +42,7 @@ internal class KotlinProcessReporting {
                 .configureProjectWithDevelocity(
                     target,
                     extension.gbos.enabled,
+                    extension.gbos.develocity,
                 )
         }
 
