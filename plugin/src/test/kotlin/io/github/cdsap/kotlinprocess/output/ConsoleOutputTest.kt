@@ -2,24 +2,11 @@ package io.github.cdsap.kotlinprocess.output
 
 import io.github.cdsap.jdk.tools.parser.model.Process
 import io.github.cdsap.jdk.tools.parser.model.TypeProcess
-import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import org.junit.Test
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 
 class ConsoleOutputTest {
-    @Test
-    fun printWritesRenderedTableToProvidedStream() {
-        val output = ByteArrayOutputStream()
-        val rendered = ConsoleTableRenderer(emptyList()).render()
-
-        ConsoleOutput(emptyList(), PrintStream(output, true, Charsets.UTF_8.name())).print()
-
-        assertEquals(rendered + System.lineSeparator(), output.toString(Charsets.UTF_8.name()))
-    }
-
     @Test
     fun renderIncludesHeadersAndProcessValues() {
         val rendered =

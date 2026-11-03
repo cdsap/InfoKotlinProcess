@@ -99,10 +99,14 @@ class InfoKotlinProcessSettingsPluginTest {
             infoKotlinProcess {
                 gbos {
                     enabled.set(true)
+                    develocity.set(true)
                 }
             }
             if (!infoKotlinProcess.gbos.enabled.get()) {
                 throw GradleException("GBOS reporting option was not applied from settings")
+            }
+            if (!infoKotlinProcess.gbos.develocity.get()) {
+                throw GradleException("GBOS Develocity option was not applied from settings")
             }
             rootProject.name = "settings-gbos-opt-in"
             """.trimIndent(),
@@ -116,6 +120,9 @@ class InfoKotlinProcessSettingsPluginTest {
                             as io.github.cdsap.kotlinprocess.InfoKotlinProcessExtension
                     if (!extension.gbos.enabled.get()) {
                         throw GradleException("GBOS reporting option was not mirrored to the root project")
+                    }
+                    if (!extension.gbos.develocity.get()) {
+                        throw GradleException("GBOS Develocity option was not mirrored to the root project")
                     }
                 }
             }
