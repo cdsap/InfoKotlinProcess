@@ -9,7 +9,7 @@ Apply the plugin in `settings.gradle(.kts)` so it observes the whole build, incl
 Using the plugins DSL:
 ```kotlin
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.3.0"
+  id("io.github.cdsap.kotlinprocess") version "0.3.1"
 }
 ```
 
@@ -17,7 +17,7 @@ plugins {
 Using the plugins DSL:
 ```groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.3.0"
+  id "io.github.cdsap.kotlinprocess" version "0.3.1"
 }
 ```
 
@@ -27,7 +27,7 @@ published consumers, but settings-plugin application is preferred for multi-proj
 #### Legacy project application (`build.gradle.kts`)
 ```kotlin
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.3.0"
+  id("io.github.cdsap.kotlinprocess") version "0.3.1"
 }
 ```
 
@@ -38,7 +38,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath("io.github.cdsap:infokotlinprocess:0.3.0")
+    classpath("io.github.cdsap:infokotlinprocess:0.3.1")
   }
 }
 
@@ -48,7 +48,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 #### Legacy project application (`build.gradle`)
 ```groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.3.0"
+  id "io.github.cdsap.kotlinprocess" version "0.3.1"
 }
 ```
 
@@ -59,7 +59,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath "io.github.cdsap:infokotlinprocess:0.3.0"
+    classpath "io.github.cdsap:infokotlinprocess:0.3.1"
   }
 }
 
