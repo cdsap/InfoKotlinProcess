@@ -27,12 +27,7 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
         settings.gradle.projectsLoaded {
             val gbosEnabled = settingsExtension.gbos.enabled.get()
             val gbosDevelocityEnabled = settingsExtension.gbos.develocity.get()
-            val projectExtension =
-                rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
-                    ?: rootProject.extensions.create(
-                        "infoKotlinProcess",
-                        InfoKotlinProcessExtension::class.java,
-                    )
+            val projectExtension = rootInfoKotlinProcessExtension(rootProject)
             projectExtension.gbos.enabled.convention(gbosEnabled)
             projectExtension.gbos.develocity.convention(gbosDevelocityEnabled)
             KotlinProcessReporting().configure(rootProject, projectExtension)
@@ -41,16 +36,18 @@ class InfoKotlinProcessPlugin : Plugin<Any> {
 
     private fun applyToProject(target: Project) {
         val rootProject = target.rootProject
-        val extension =
-            rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
-                ?: rootProject.extensions.create(
-                    "infoKotlinProcess",
-                    InfoKotlinProcessExtension::class.java,
-                )
+        val extension = rootInfoKotlinProcessExtension(rootProject)
         GbosOptIn.configureConventions(extension.gbos, rootProject.providers)
 
         target.gradle.rootProject {
             KotlinProcessReporting().configure(target, extension)
         }
     }
+
+    private fun rootInfoKotlinProcessExtension(rootProject: Project): InfoKotlinProcessExtension =
+        rootProject.extensions.findByType(InfoKotlinProcessExtension::class.java)
+            ?: rootProject.extensions.create(
+                "infoKotlinProcess",
+                InfoKotlinProcessExtension::class.java,
+            )
 }
