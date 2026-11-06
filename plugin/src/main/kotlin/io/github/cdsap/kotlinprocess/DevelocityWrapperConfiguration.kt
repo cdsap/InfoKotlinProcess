@@ -12,21 +12,14 @@ class DevelocityWrapperConfiguration {
         configureProjectWithDevelocityIfPresent(
             target,
             target.providers.provider { false },
-            target.providers.provider { false },
         )
 
     fun configureProjectWithDevelocityIfPresent(
         target: Project,
         gbosEnabled: Provider<Boolean>,
-    ): Boolean = configureProjectWithDevelocityIfPresent(target, gbosEnabled, gbosEnabled)
-
-    fun configureProjectWithDevelocityIfPresent(
-        target: Project,
-        gbosEnabled: Provider<Boolean>,
-        gbosDevelocityEnabled: Provider<Boolean>,
     ): Boolean {
         val develocity = target.extensions.findByType(DevelocityConfiguration::class.java) ?: return false
-        buildScanDevelocityReporting(target, develocity, gbosEnabled, gbosDevelocityEnabled)
+        buildScanDevelocityReporting(target, develocity, gbosEnabled)
         return true
     }
 
@@ -34,7 +27,6 @@ class DevelocityWrapperConfiguration {
         configureProjectWithDevelocity(
             target,
             target.providers.provider { false },
-            target.providers.provider { false },
         )
     }
 
@@ -42,23 +34,14 @@ class DevelocityWrapperConfiguration {
         target: Project,
         gbosEnabled: Provider<Boolean>,
     ) {
-        configureProjectWithDevelocity(target, gbosEnabled, gbosEnabled)
-    }
-
-    fun configureProjectWithDevelocity(
-        target: Project,
-        gbosEnabled: Provider<Boolean>,
-        gbosDevelocityEnabled: Provider<Boolean>,
-    ) {
         val develocity = target.extensions.getByType(DevelocityConfiguration::class.java)
-        buildScanDevelocityReporting(target, develocity, gbosEnabled, gbosDevelocityEnabled)
+        buildScanDevelocityReporting(target, develocity, gbosEnabled)
     }
 
     private fun buildScanDevelocityReporting(
         project: Project,
         buildScanExtension: DevelocityConfiguration,
         gbosEnabled: Provider<Boolean>,
-        gbosDevelocityEnabled: Provider<Boolean>,
     ) {
         val providers = project.kotlinProcessProviders()
         val gbosJsonFile = project.layout.buildDirectory.file("info-kotlin-process/gbos.json")
@@ -66,7 +49,7 @@ class DevelocityWrapperConfiguration {
 
         buildScanExtension.buildScan.buildFinished {
             val processes = collectKotlinProcesses(providers)
-            val develocityEnabled = gbosDevelocityEnabled.get()
+            val develocityEnabled = gbosEnabled.get()
             DevelocityValues(
                 buildScanExtension,
                 processes,
