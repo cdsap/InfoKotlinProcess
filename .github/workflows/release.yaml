@@ -1,0 +1,110 @@
+name: Publish Gradle plugin
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Publish release to Gradle Plugin Portal
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the published release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Validate release policy
+        shell: bash
+        env:
+          RELEASE_DRAFT: ${{ github.event.release.draft }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$RELEASE_DRAFT" == "true" ]]; then
+            echo "::error::Draft releases cannot publish to the Gradle Plugin Portal"
+            exit 1
+          fi
+
+          if [[ "$RELEASE_PRERELEASE" == "true" ]]; then
+            echo "::error::Prereleases cannot publish to the Gradle Plugin Portal"
+            exit 1
+          fi
+
+      - name: Verify release version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+
+          tag_version="${RELEASE_TAG#v}"
+          if [[ -z "$tag_version" || "$tag_version" == "$RELEASE_TAG" ]]; then
+            echo "::error::Release tag '$RELEASE_TAG' must use the v<version> format"
+            exit 1
+          fi
+
+          project_version="$(./gradlew -q :infokotlinprocess:properties | awk -F': ' '$1 == "version" {print $2; exit}')"
+          if [[ -z "$project_version" ]]; then
+            echo "::error::Unable to determine the :infokotlinprocess project version"
+            exit 1
+          fi
+          if [[ "$project_version" == *SNAPSHOT* ]]; then
+            echo "::error::Refusing to publish snapshot plugin version '$project_version'"
+            exit 1
+          fi
+          if [[ "$project_version" != "$tag_version" ]]; then
+            echo "::error::Release tag version '$tag_version' does not match project version '$project_version'"
+            exit 1
+          fi
+
+          echo "Publishing InfoKotlinProcess version $project_version"
+
+      - name: Check publication credentials
+        shell: bash
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GRADLE_PUBLISH_KEY:-}" ]]; then
+            echo "::error::GRADLE_PUBLISH_KEY is not configured"
+            exit 1
+          fi
+          if [[ -z "${GRADLE_PUBLISH_SECRET:-}" ]]; then
+            echo "::error::GRADLE_PUBLISH_SECRET is not configured"
+            exit 1
+          fi
+
+      - name: Validate plugins and tests
+        run: ./gradlew :infokotlinprocess:validatePlugins :infokotlinprocess:test --no-daemon --stacktrace
+
+      - name: Validate Plugin Portal publication
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: ./gradlew :infokotlinprocess:publishPlugins --validate-only --stacktrace
+
+      - name: Publish plugin to Gradle Plugin Portal
+        env:
+          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: ./gradlew :infokotlinprocess:publishPlugins --stacktrace
