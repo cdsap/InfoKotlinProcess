@@ -19,5 +19,4 @@ abstract class InfoKotlinProcessExtension
 
 abstract class GbosReportingExtension {
     abstract val enabled: Property<Boolean>
-    abstract val develocity: Property<Boolean>
 }
