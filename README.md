@@ -9,7 +9,7 @@ Apply the plugin in `settings.gradle(.kts)` so it observes the whole build, incl
 Using the plugins DSL:
 ```kotlin
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.3.0"
+  id("io.github.cdsap.kotlinprocess") version "0.3.1"
 }
 ```
 
@@ -17,7 +17,7 @@ plugins {
 Using the plugins DSL:
 ```groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.3.0"
+  id "io.github.cdsap.kotlinprocess" version "0.3.1"
 }
 ```
 
@@ -27,7 +27,7 @@ published consumers, but settings-plugin application is preferred for multi-proj
 #### Legacy project application (`build.gradle.kts`)
 ```kotlin
 plugins {
-  id("io.github.cdsap.kotlinprocess") version "0.3.0"
+  id("io.github.cdsap.kotlinprocess") version "0.3.1"
 }
 ```
 
@@ -38,7 +38,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath("io.github.cdsap:infokotlinprocess:0.3.0")
+    classpath("io.github.cdsap:infokotlinprocess:0.3.1")
   }
 }
 
@@ -48,7 +48,7 @@ apply(plugin = "io.github.cdsap.kotlinprocess")
 #### Legacy project application (`build.gradle`)
 ```groovy
 plugins {
-  id "io.github.cdsap.kotlinprocess" version "0.3.0"
+  id "io.github.cdsap.kotlinprocess" version "0.3.1"
 }
 ```
 
@@ -59,7 +59,7 @@ buildscript {
     gradlePluginPortal()
   }
   dependencies {
-    classpath "io.github.cdsap:infokotlinprocess:0.3.0"
+    classpath "io.github.cdsap:infokotlinprocess:0.3.1"
   }
 }
 
@@ -77,8 +77,8 @@ The field `Usage` represents the value obtained at the end of the build using `j
 
 #### GBOS observations
 
-GBOS file sinks and the GBOS Develocity projection are independent opt-ins. File output
-uses `infoKotlinProcess.gbos.enabled`:
+GBOS file sinks and the GBOS Develocity projection are controlled by one opt-in:
+`infoKotlinProcess.gbos.enabled`:
 
 ```properties
 infoKotlinProcess.gbos.enabled=true
@@ -94,23 +94,21 @@ infoKotlinProcess {
 }
 ```
 
-The Develocity projection has its own opt-in:
+The Develocity projection is controlled by the same opt-in:
 
 ```properties
-infoKotlinProcess.gbos.develocity.enabled=true
+infoKotlinProcess.gbos.enabled=true
 ```
 
-Develocity is detected automatically. Without the Develocity opt-in, legacy
+Develocity is detected automatically. Without the opt-in, legacy
 `Kotlin-Process-*` custom values remain unchanged. With it, the legacy values
-are replaced by the `gbos.*` projection. The two flags can be enabled independently:
+are replaced by the `gbos.*` projection, and the local GBOS files are written:
 
-| Develocity | File GBOS | Develocity GBOS | Result |
-| --- | --- | --- | --- |
-| absent | off/on | off/on | no custom values; files follow the File GBOS flag |
-| present | off | off | legacy `Kotlin-Process-*` values |
-| present | on | off | legacy values plus GBOS files |
-| present | off | on | only `gbos.*` values |
-| present | on | on | only `gbos.*` values plus GBOS files |
+| Develocity | GBOS opt-in | Result |
+| --- | --- | --- |
+| absent | off/on | no custom values; files follow the GBOS opt-in |
+| present | off | legacy `Kotlin-Process-*` values |
+| present | on | only `gbos.*` values plus GBOS files |
 
 Each Kotlin daemon is reported as a `jvm.process` entity observation.
 
