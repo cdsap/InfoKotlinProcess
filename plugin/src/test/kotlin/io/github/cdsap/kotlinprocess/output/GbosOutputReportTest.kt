@@ -6,9 +6,11 @@ import com.networknt.schema.SchemaRegistry
 import com.networknt.schema.SpecificationVersion
 import io.github.cdsap.jdk.tools.parser.model.Process
 import io.github.cdsap.jdk.tools.parser.model.TypeProcess
+import io.github.cdsap.kotlinprocess.GbosOutputFiles
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -19,6 +21,28 @@ class GbosOutputReportTest {
     val temporaryFolder = TemporaryFolder()
 
     private val process = Process("9011", 1.0, 0.5, 0.75, 0.25, 2.5, "-XX:+UseG1GC", TypeProcess.Kotlin)
+
+    @Test
+    fun sharedOutputFilesUseTheStableBuildDirectory() {
+        val project = ProjectBuilder.builder().build()
+
+        val outputFiles = GbosOutputFiles(project)
+
+        assertEquals(
+            project.layout.buildDirectory
+                .file("info-kotlin-process/gbos.json")
+                .get()
+                .asFile,
+            outputFiles.jsonFile.get().asFile,
+        )
+        assertEquals(
+            project.layout.buildDirectory
+                .file("info-kotlin-process/gbos.ndjson")
+                .get()
+                .asFile,
+            outputFiles.ndjsonFile.get().asFile,
+        )
+    }
 
     @Test
     fun writesStableJsonAndNdjsonFilesFromTheSameObservations() {

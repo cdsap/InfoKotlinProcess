@@ -54,6 +54,7 @@ internal class KotlinProcessReporting {
         extension: InfoKotlinProcessExtension,
     ) {
         val providers = project.kotlinProcessProviders()
+        val gbosOutputFiles = GbosOutputFiles(project)
         val service =
             project.gradle.sharedServices.registerIfAbsent(
                 "kotlinProcessService",
@@ -62,8 +63,8 @@ internal class KotlinProcessReporting {
                 parameters.jInfoProvider = providers.jInfo
                 parameters.jStatProvider = providers.jStat
                 parameters.gbosEnabled.set(extension.gbos.enabled)
-                parameters.gbosJsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.json"))
-                parameters.gbosNdjsonFile.set(project.layout.buildDirectory.file("info-kotlin-process/gbos.ndjson"))
+                parameters.gbosJsonFile.set(gbosOutputFiles.jsonFile)
+                parameters.gbosNdjsonFile.set(gbosOutputFiles.ndjsonFile)
             }
         project.serviceOf<BuildEventsListenerRegistry>().onTaskCompletion(service)
     }
