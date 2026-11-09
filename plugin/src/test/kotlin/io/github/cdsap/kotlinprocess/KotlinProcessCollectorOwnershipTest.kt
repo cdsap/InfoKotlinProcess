@@ -53,16 +53,17 @@ class KotlinProcessCollectorOwnershipTest {
             consolidation.contains("KotlinProcessCollector().collect("),
         )
         assertTrue(
-            "KotlinProcessConsolidation must expose one provider bundle boundary",
-            consolidation.contains("internal fun collectKotlinProcesses(providers: KotlinProcessProviders)"),
+            "KotlinProcessConsolidation must expose one provider reader boundary",
+            consolidation.contains("internal class KotlinProcessReader") &&
+                consolidation.contains("fun collect(): List<Process>"),
         )
         assertTrue(
-            "InfoKotlinProcessBuildService must use collectKotlinProcesses",
-            buildService.contains("collectKotlinProcesses("),
+            "InfoKotlinProcessBuildService must use KotlinProcessReader",
+            buildService.contains("KotlinProcessReader") && buildService.contains(").collect()"),
         )
         assertTrue(
-            "DevelocityWrapperConfiguration must use collectKotlinProcesses",
-            develocity.contains("collectKotlinProcesses("),
+            "DevelocityWrapperConfiguration must use KotlinProcessReader",
+            develocity.contains("KotlinProcessReader") && develocity.contains("reader.collect()"),
         )
         assertFalse(
             "InfoKotlinProcessBuildService must not call KotlinProcessCollector directly",
