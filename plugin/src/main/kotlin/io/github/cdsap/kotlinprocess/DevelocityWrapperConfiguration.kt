@@ -44,10 +44,11 @@ class DevelocityWrapperConfiguration {
         gbosEnabled: Provider<Boolean>,
     ) {
         val providers = project.kotlinProcessProviders()
+        val reader = KotlinProcessReader(providers)
         val gbosOutputFiles = GbosOutputFiles(project)
 
         buildScanExtension.buildScan.buildFinished {
-            val processes = collectKotlinProcesses(providers)
+            val processes = reader.collect()
             val develocityEnabled = gbosEnabled.get()
             DevelocityValues(
                 buildScanExtension,

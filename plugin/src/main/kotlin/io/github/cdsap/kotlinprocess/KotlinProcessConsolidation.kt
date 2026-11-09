@@ -17,8 +17,12 @@ fun Project.kotlinProcessProviders(): KotlinProcessProviders =
         jInfo = jInfo(Constants.KOTLIN_PROCESS_NAME),
     )
 
-internal fun collectKotlinProcesses(providers: KotlinProcessProviders): List<Process> =
-    KotlinProcessCollector().collect(
-        providers.jStat.get(),
-        providers.jInfo.get(),
-    )
+internal class KotlinProcessReader(
+    private val providers: KotlinProcessProviders,
+) {
+    fun collect(): List<Process> =
+        KotlinProcessCollector().collect(
+            providers.jStat.get(),
+            providers.jInfo.get(),
+        )
+}
