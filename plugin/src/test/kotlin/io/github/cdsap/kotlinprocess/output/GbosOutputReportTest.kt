@@ -4,6 +4,7 @@ import com.networknt.schema.InputFormat
 import com.networknt.schema.SchemaLocation
 import com.networknt.schema.SchemaRegistry
 import com.networknt.schema.SpecificationVersion
+import groovy.json.JsonSlurper
 import io.github.cdsap.jdk.tools.parser.model.Process
 import io.github.cdsap.jdk.tools.parser.model.TypeProcess
 import io.github.cdsap.kotlinprocess.GbosOutputFiles
@@ -69,6 +70,41 @@ class GbosOutputReportTest {
         ndjson.readLines().forEach { line ->
             assertTrue(observationSchema.validate(line, InputFormat.JSON).isEmpty())
         }
+    }
+
+    @Test
+    fun fileAndDevelocityOutputsShareObservationsInProcessOrder() {
+        val processes = listOf(process, process.copy(pid = "42"))
+        val json = temporaryFolder.newFile("ordered.json")
+        val ndjson = temporaryFolder.newFile("ordered.ndjson")
+        GbosOutputReport(json, ndjson).write(processes, enabled = true)
+
+        val parser = JsonSlurper()
+        val report = parser.parseText(json.readText()) as Map<*, *>
+        val reportObservations = report["observations"] as List<*>
+        val lines = ndjson.readLines().map { parser.parseText(it) as Map<*, *> }
+        val fragments =
+            GbosDevelocityProjection
+                .values(processes)
+                .filter { it.first == GbosDevelocityProjection.OBSERVATION_VALUE }
+                .map { parser.parseText(it.second) as Map<*, *> }
+
+        assertEquals(reportObservations, lines)
+        assertEquals(listOf(9011, 42), lines.map { (it["attributes"] as Map<*, *>)["process.pid"] })
+        assertEquals(fragments, lines.map { it - "schemaVersion" - "producer" })
+    }
+
+    @Test
+    fun emptyInputRemovesExistingFilesAndProducesNoCustomValues() {
+        val json = temporaryFolder.newFile("empty.json")
+        val ndjson = temporaryFolder.newFile("empty.ndjson")
+
+        GbosOutputReport(json, ndjson).write(emptyList(), enabled = true)
+
+        assertFalse(json.exists())
+        assertFalse(ndjson.exists())
+        assertTrue(GbosDevelocityProjection.values(emptyList()).isEmpty())
+        assertEquals("\n", GbosObservations.ndjson(emptyList()))
     }
 
     @Test

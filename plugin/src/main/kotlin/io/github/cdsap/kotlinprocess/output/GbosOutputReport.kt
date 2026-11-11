@@ -23,8 +23,8 @@ internal class GbosOutputReport(
         // must not leave one sink from this build beside another sink from the previous one.
         val contents =
             listOf(
-                outputJson to GbosDevelocityProjection.reportJson(processes),
-                outputNdjson to GbosDevelocityProjection.ndjson(processes),
+                outputJson to GbosObservations.reportJson(processes),
+                outputNdjson to GbosObservations.ndjson(processes),
             )
         contents.forEach { (output, content) -> replaceAtomically(output, content) }
     }
