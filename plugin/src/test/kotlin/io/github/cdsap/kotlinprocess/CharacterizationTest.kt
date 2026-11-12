@@ -285,6 +285,39 @@ class CharacterizationTest {
         assertEquals(reuse, emptyList<String>(), reuse.consoleTables())
     }
 
+    @Test
+    fun gbosFilesFollowBuildDirectoryForBothReportingRoutesWithConfigurationCache() {
+        listOf(false, true).forEach { develocity ->
+            val settings = if (develocity) "plugins { id 'com.gradle.develocity' }" else ""
+            val project =
+                project(
+                    "settings.gradle" to settings,
+                    "build.gradle" to
+                        """
+                        plugins { id 'io.github.cdsap.kotlinprocess' }
+                        layout.buildDirectory.set(layout.projectDirectory.dir('custom-build'))
+                        """.trimIndent(),
+                )
+            val files = listOf("gbos.json", "gbos.ndjson").map { File(project, "custom-build/info-kotlin-process/$it") }
+            val args = arrayOf("-P$GBOS_PROPERTY=true", "--configuration-cache", "--configuration-cache-problems=fail")
+
+            val store = build(project, develocity, *args)
+            assertTrue(store, store.contains("Configuration cache entry stored."))
+            val contents =
+                files.map { file ->
+                    assertTrue("Missing $file", file.isFile)
+                    file.readText()
+                }
+            files.forEach { assertTrue(it.delete()) }
+
+            val reuse = build(project, develocity, *args)
+            assertTrue(reuse, reuse.contains("Reusing configuration cache."))
+            assertEquals(contents, files.map { it.readText() })
+            assertFalse(File(project, "build/info-kotlin-process/gbos.json").exists())
+            assertFalse(File(project, "build/info-kotlin-process/gbos.ndjson").exists())
+        }
+    }
+
     private fun collect(vararg daemons: FakeKotlinDaemon): List<Process> =
         KotlinProcessCollector().collect(
             FakeJdkTools.jStatOutput(daemons.toList()),
